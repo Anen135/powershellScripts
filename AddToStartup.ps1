@@ -1,4 +1,11 @@
-# AddToStartup.ps1
+<#
+.SYNOPSIS
+    Добавляет приложение в автозагрузку Windows.
+.DESCRIPTION
+    Скрипт добавляет указанное приложение в реестр для автозапуска при входе пользователя в систему.
+.NOTES
+    Версия: 1.1
+#>
 param(
     [Parameter(Mandatory = $true)]
     [string]$AppName,     # Имя записи в реестре
