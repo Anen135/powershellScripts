@@ -1,38 +1,60 @@
-<#
+﻿<#
 .SYNOPSIS
-    Удаляет приложение из автозагрузки Windows.
+    Удаляет указанное приложение из автозагрузки Windows.
+
 .DESCRIPTION
-    Скрипт удаляет указанное приложение из реестра, чтобы оно не запускалось при входе пользователя в систему.
+    Скрипт удаляет запись из раздела реестра HKCU:\Software\Microsoft\Windows\CurrentVersion\Run,
+    что предотвращает автоматический запуск приложения при входе пользователя.
+
+.PARAMETER AppName
+    Имя записи в автозагрузке (ключ в реестре), которую необходимо удалить.
+
 .NOTES
-    Версия: 1.1
+    Версия: 2.0
+    Автор: Системный администратор
 #>
+
+[CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$AppName    # Имя записи в реестре для удаления
+    [ValidateNotNullOrEmpty()]
+    [string]$AppName
 )
 
-try {
-    # Проверим, есть ли запись
-    $exists = Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Select-Object -Property $AppName
+begin {
+    Write-Verbose "Инициализация параметров..."
+    $RegPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+}
 
-    if ($null -ne $exists.$AppName) {
-        # Удаляем запись
-        Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name $AppName
-        Write-Host "✅ Запись '$AppName' удалена из автозагрузки."
+process {
+    try {
+        Write-Verbose "Проверка наличия записи '$AppName' в $RegPath..."
+        $Exists = Get-ItemProperty -Path $RegPath -ErrorAction SilentlyContinue | Select-Object -Property $AppName
 
-        # Проверяем, что удалено
-        $check = Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -ErrorAction SilentlyContinue | Select-Object -Property $AppName
-        if ($null -eq $check.$AppName) {
-            Write-Host "✔ Подтверждено: запись '$AppName' больше не существует."
+        if ($null -ne $Exists.$AppName) {
+            Write-Verbose "Запись найдена. Удаление..."
+            Remove-ItemProperty -Path $RegPath -Name $AppName -ErrorAction Stop
+
+            Write-Output "Запись '$AppName' удалена из автозагрузки."
+
+            Write-Verbose "Проверка результата..."
+            $Check = Get-ItemProperty -Path $RegPath -ErrorAction SilentlyContinue | Select-Object -Property $AppName
+            if ($null -eq $Check.$AppName) {
+                Write-Output "Подтверждено: запись '$AppName' отсутствует в автозагрузке."
+            }
+            else {
+                Write-Warning "Запись '$AppName' все ещё существует после попытки удаления."
+            }
         }
         else {
-            Write-Host "⚠ Запись '$AppName' все ещё присутствует!"
+            Write-Output "Запись '$AppName' не найдена в автозагрузке."
         }
     }
-    else {
-        Write-Host "ℹ Запись '$AppName' не найдена в автозагрузке."
+    catch {
+        Write-Error "Ошибка при удалении записи: $($_.Exception.Message)"
     }
 }
-catch {
-    Write-Host "❌ Ошибка: $($_.Exception.Message)"
+
+end {
+    Write-Verbose "Завершение работы скрипта."
 }

@@ -1,41 +1,63 @@
-<#
+﻿<#
 .SYNOPSIS
-    Добавляет приложение в автозагрузку Windows.
+    Добавляет указанное приложение в автозагрузку Windows.
+
 .DESCRIPTION
-    Скрипт добавляет указанное приложение в реестр для автозапуска при входе пользователя в систему.
+    Скрипт регистрирует путь к приложению в разделе реестра HKCU:\Software\Microsoft\Windows\CurrentVersion\Run
+    для автоматического запуска при входе пользователя в систему.
+
+.PARAMETER AppName
+    Имя записи в автозагрузке (ключ в реестре).
+
+.PARAMETER AppPath
+    Полный путь к исполняемому файлу приложения.
+
 .NOTES
-    Версия: 1.1
+    Версия: 2.0
+    Автор: Системный администратор
 #>
+
+[CmdletBinding()]
 param(
     [Parameter(Mandatory = $true)]
-    [string]$AppName,     # Имя записи в реестре
+    [ValidateNotNullOrEmpty()]
+    [string]$AppName,
 
     [Parameter(Mandatory = $true)]
-    [string]$AppPath      # Полный путь к приложению
+    [ValidateScript({Test-Path $_})]
+    [string]$AppPath
 )
 
-# Формируем команду для запуска через cmd
-$CmdValue = "cmd /c `"$AppPath`""
+begin {
+    Write-Verbose "Инициализация параметров..."
+    $RegPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+    $CmdValue = "cmd /c `"$AppPath`""
+}
 
-try {
-    # Добавляем в HKCU автозагрузку
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" -Name $AppName -Value $CmdValue
+process {
+    try {
+        Write-Verbose "Добавление записи в реестр: $RegPath"
+        Set-ItemProperty -Path $RegPath -Name $AppName -Value $CmdValue -ErrorAction Stop
 
-    Write-Host "✅ Запись '$AppName' успешно добавлена в автозагрузку."
-    Write-Host "`n📋 Проверка записи в HKCU:\Software\Microsoft\Windows\CurrentVersion\Run`n"
+        Write-Output "Запись '$AppName' успешно добавлена в автозагрузку."
 
-    # Проверяем наличие записи
-    $check = Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" | Select-Object -Property $AppName
+        Write-Verbose "Проверка результата..."
+        $Check = Get-ItemProperty -Path $RegPath -ErrorAction Stop | Select-Object -Property $AppName
 
-    if ($check.$AppName -eq $CmdValue) {
-        Write-Host "✔ Найдена запись:"
-        Write-Host "Имя: $AppName"
-        Write-Host "Значение: $($check.$AppName)"
+        if ($Check.$AppName -eq $CmdValue) {
+            Write-Output "Проверка завершена успешно:"
+            Write-Output "Имя: $AppName"
+            Write-Output "Значение: $($Check.$AppName)"
+        }
+        else {
+            Write-Warning "Запись '$AppName' не совпадает с ожидаемым значением."
+        }
     }
-    else {
-        Write-Host "⚠ Запись не найдена или отличается!"
+    catch {
+        Write-Error "Ошибка при добавлении записи в автозагрузку: $($_.Exception.Message)"
     }
 }
-catch {
-    Write-Host "❌ Ошибка: $($_.Exception.Message)"
+
+end {
+    Write-Verbose "Завершение работы скрипта."
 }
