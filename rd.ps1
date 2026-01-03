@@ -10,7 +10,6 @@ param (
     [switch]$Rollback
 )
 
-# ================= HELPERS =================
 function Log {
     param([string]$Message, [string]$Color = "White")
     if ($DryRun) {
@@ -26,7 +25,6 @@ function Normalize-Path {
     return [System.IO.Path]::GetFullPath($Path).TrimEnd('\')
 }
 
-# Нормализуем пути сразу
 try {
     $Source = Normalize-Path $Source
     if (-not (Test-Path $Source -PathType Container)) {
@@ -40,11 +38,11 @@ $Destination = Normalize-Path $Destination
 
 $LogFile = Join-Path $env:TEMP "robomove_$(Get-Date -Format yyyyMMdd_HHmmss).log"
 
-# ================= ROLLBACK MODE =================
+
 if ($Rollback) {
     Log "Rollback mode activated" -Color Cyan
 
-    # Проверки предусловий
+    
     if (-not (Test-Path $Source)) { throw "Source path does not exist: $Source" }
     if (-not (Test-Path $Destination)) { throw "Destination path does not exist: $Destination" }
 
@@ -90,7 +88,7 @@ if ($Rollback) {
     if ($exitCode -gt 1) {
         Log "Robocopy completed rollback with warnings (code $exitCode). Check log." -Color Magenta
     }
-        # Проверка остатка в Destination
+        
         $remaining = Get-ChildItem -Path $Destination -Recurse -File -Force -ErrorAction SilentlyContinue
         if ($remaining) {
             Log "Warning: $Destination is not empty after move ($($remaining.Count) files remain). Leaving it intact." -Color Yellow
@@ -105,11 +103,11 @@ if ($Rollback) {
         exit 0
 }
 
-# ================= NORMAL MODE (MOVE + SYMLINK) =================
+
 
 Log "Starting move operation: $Source -> $Destination" -Color Cyan
 
-# Обработка случая, когда источник уже пуст
+
 $items = Get-ChildItem $Source -Force -ErrorAction SilentlyContinue
 if ($items.Count -eq 0) {
     Log "Source folder is already empty"
@@ -133,16 +131,16 @@ if ($items.Count -eq 0) {
     exit 0
 }
 
-# Создаём целевую папку, если нужно
+
 if (-not (Test-Path $Destination)) {
     Log "Creating destination directory: $Destination"
     if (-not $DryRun) { New-Item -ItemType Directory -Path $Destination -Force | Out-Null }
 }
 
-# Копирование с перемещением (/MOV)
+
 Log "Copying and moving files (this may take a while for large directories)"
 
-# Аргументы без /LOG+ — лог будем формировать сами
+
 $robocopyArgs = @(
     $Source, $Destination,
     "/MOV", "/E", "/MT:16", "/R:3", "/W:5"
@@ -152,20 +150,20 @@ if ($DryRun) { $robocopyArgs += "/L" }
 Log "robocopy $($robocopyArgs -join ' ')"
 
 if (-not $DryRun) {
-# Устанавливаем правильную кодировку для вывода robocopy
+
     $originalEncoding = [Console]::OutputEncoding
     [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(866)
 
     try {
         $robocopyOutput = robocopy @robocopyArgs
 
-        # Сохраняем лог в UTF-8 — кириллица будет идеальной
+        
         $robocopyOutput | Out-File $LogFile -Encoding utf8
 
         $exitCode = $LASTEXITCODE
     }
     finally {
-        # Восстанавливаем исходную кодировку (важно!)
+        
         [Console]::OutputEncoding = $originalEncoding
     }
 
@@ -177,7 +175,7 @@ if (-not $DryRun) {
     }
 }
 
-# Критическая проверка: источник должен быть пуст после /MOV
+
 if (-not $DryRun) {
     $remaining = Get-ChildItem -Path $Source -Recurse -File -Force -ErrorAction SilentlyContinue
     if ($remaining) {
@@ -185,7 +183,7 @@ if (-not $DryRun) {
     }
 }
 
-# Удаление исходной папки и создание symlink
+
 Log "Removing original directory and creating symbolic link"
 if (-not $DryRun) {
     Remove-Item $Source -Recurse -Force
