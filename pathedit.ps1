@@ -69,7 +69,7 @@ function Draw-UI {
     # Заголовок
     [Console]::SetCursorPosition(0, $layout.HeaderLine)
     $header = "Edit PATH entries (total: $($paths.Length - 1) real paths)"
-    [Console]::Write($header.PadRight($layout.WindowWidth - 1))
+    Write-Host $header.PadRight($layout.WindowWidth - 1) -ForegroundColor Cyan
 
     # Разделитель
     Clear-Line $layout.SeparatorLine

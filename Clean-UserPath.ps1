@@ -57,22 +57,30 @@ process {
             return
         }
 
-        # Создание резервной копии
-        $oldPath | Out-File -FilePath $backupPath -Encoding UTF8 -Force
-        Write-Output "Резервная копия PATH сохранена: $backupPath"
+        # Сначала вычисляем новый PATH
+        $newPath = $validPaths -join ';'
 
-        # Обновление PATH
-        $newPath = ($validPaths -join ';')
-        Set-ItemProperty -Path $regPath -Name Path -Value $newPath -ErrorAction Stop
-        Write-Output "Переменная PATH обновлена."
-
-        # Отчёт
-        [PSCustomObject]@{
-            Status        = "Updated"
-            BackupPath    = $backupPath
+        # Потом создаём объект для бэкапа (теперь $newPath существует)
+        $backupObject = [PSCustomObject]@{
+            Timestamp     = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+            OriginalPath  = $oldPath
+            OriginalPaths = $pathList
+            ValidPaths    = $validPaths
+            InvalidPaths  = $invalidPaths
+            NewPath       = $newPath
             RemovedCount  = $invalidPaths.Count
-            RemovedPaths  = $invalidPaths
         }
+
+        # Сохраняем JSON-бэкап
+        $backupPath = Join-Path $env:USERPROFILE "Desktop\user-path-backup-$timestamp.json"
+        $backupObject | ConvertTo-Json -Depth 10 | Out-File -FilePath $backupPath -Encoding UTF8 -Force
+
+        Write-Output "Резервная копия сохранена в JSON: $backupPath"
+        Write-Output "Удалено несуществующих путей: $($invalidPaths.Count)"
+
+        # Обновляем реестр
+        Set-ItemProperty -Path $regPath -Name Path -Value $newPath -ErrorAction Stop
+        Write-Output "Переменная PATH успешно обновлена."
     }
     catch {
         Write-Error "Ошибка при обновлении PATH: $($_.Exception.Message)"
