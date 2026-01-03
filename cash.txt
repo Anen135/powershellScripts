@@ -1,0 +1,9 @@
+C:\Users\whoyo\AppData\Local\Temp
+C:\Users\whoyo\AppData\Local\Microsoft\Edge\User Data\Default\Code Cache
+C:\Users\whoyo\AppData\Local\Microsoft\Edge\User Data\Default\Cache\Cache_Data
+C:\Users\whoyo\AppData\Local\npm-cache
+C:\Users\whoyo\AppData\Local\JetBrains\PyCharm2025.2\caches
+C:\Users\whoyo\AppData\Local\FakePath\
+C:\Users\whoyo\AppData\Local\Package Cache
+C:\Users\whoyo\AppData\Local\Opera Software\Opera GX Stable\Default\Cache
+C:\Users\whoyo\AppData\Roaming\Opera Software\Opera GX Stable\Default\Code Cache
