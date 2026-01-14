@@ -1,4 +1,5 @@
-
+# V2
+# DirNav
 Add-Type -TypeDefinition @"
 public enum UserAction
 {
@@ -23,6 +24,18 @@ $keyToActionMap = @{
     'S'          = [UserAction]::GoToParent
 }
 
+$theme = @{
+    DF = @{
+        Foreground = [Console]::ForegroundColor
+        Background = [Console]::BackgroundColor
+    }
+    Selected = @{
+        Foreground = [ConsoleColor]::White
+        Background = [ConsoleColor]::DarkCyan
+    }
+}
+
+
 function Get-UserActionFromKey {
     param([System.ConsoleKeyInfo]$key)
 
@@ -44,11 +57,9 @@ function Get-UserActionFromKey {
 
 
 [Console]::CursorVisible = $false
-
 $cwd = Get-Location
-$items = Get-ChildItem -Force | Sort-Object PSIsContainer, Name
+$items = @(Get-ChildItem -ErrorAction Stop | Sort-Object PSIsContainer, Name)
 $selectedIndex = 0
-$message = $null
 
 function Get-UILayout {
     $height = [Console]::WindowHeight
@@ -68,8 +79,8 @@ function Get-UILayout {
 
 function Clear-Line {
     param([int]$line)
-    [Console]::SetCursorPosition(0, $line)
-    [Console]::Write(" " * ([Console]::WindowWidth - 1))
+    # [Console]::SetCursorPosition(0, $line)
+    # [Console]::Write(" " * ([Console]::WindowWidth - 1))
 }
 
 function Update-Header {
@@ -100,16 +111,24 @@ function Update-ItemList {
     if ($start + $maxLines -gt $items.Length) {
         $start = [Math]::Max(0, $items.Length - $maxLines)
     }
-
     for ($i = 0; $i -lt $maxLines; $i++) {
         $row = $start + $i
         [Console]::SetCursorPosition(0, $top + $i)
+        [Console]::ForegroundColor = $theme.DF.Foreground
+        [Console]::BackgroundColor = $theme.DF.Background
 
         if ($row -lt $items.Length) {
             $item = $items[$row]
             $prefix = if ($row -eq $selectedIndex) { "> " } else { "  " }
             $type = if ($item.PSIsContainer) { "[DIR] " } else { "[FILE] " }
             $line = "$prefix$type$item"
+            if ($line.Length -gt $layout.WindowWidth) {
+                $line = $line.Substring(0, $layout.WindowWidth)
+            }
+            if ($row -eq $selectedIndex) {
+                [Console]::ForegroundColor = $theme.Selected.Foreground
+                [Console]::BackgroundColor = $theme.Selected.Background
+            }
 
             [Console]::Write($line)
             $remaining = $layout.WindowWidth - $line.Length - 1
@@ -128,19 +147,22 @@ function Update-Message {
     Clear-Line $layout.MessageLine
 
     if ($msg) {
+        if ($msg.Length -gt $layout.WindowWidth) {
+            $msg = $msg.Substring(0, $layout.WindowWidth)
+        }
+
         [Console]::SetCursorPosition(0, $layout.MessageLine)
         $color = switch -Wildcard ($msg) {
-            "*not empty*"   { "Yellow" }
-            "*Cannot*"      { "Red" }
-            "*Error*"       { "Red" }
-            "*confirm*"     { "Yellow" }
-            "*cancelled*"   { "Yellow" }
-            "*root*"        { "Yellow" }
-            "*deleted*"     { "Red" }
-            default         { "Green" }
-        }
+            "*[Warning]*"   { "Yellow" }
+            "*[Error]*"     { "Red"    }
+            "*[Info]*"      { "Blue"   }
+            default         { "Green"  }
+        }   
         Write-Host $msg -ForegroundColor $color -NoNewline
-        [Console]::Write(" " * ($layout.WindowWidth - $msg.Length - 1))
+        $padding = $layout.WindowWidth - $msg.Length - 10
+        if ($padding -gt 0) {
+            [Console]::Write(" " * $padding)
+        }
     }
 }
 
@@ -159,7 +181,7 @@ function Update-Footer {
 }
 
 
-[Console]::Clear()
+# [Console]::Clear()
 Update-Header
 Update-Separator
 Update-ItemList -items $items -selectedIndex $selectedIndex
@@ -170,41 +192,44 @@ Update-Footer
 
 $running = $true
 
-while ($running) {
-    $message = $null
-
+:app while ($running) {
     $key = [Console]::ReadKey($true)
     $action = Get-UserActionFromKey -key $key
 
     switch ($action) {
         ([UserAction]::NavigateUp) {
-            if ($items.Length -eq 0) { continue }
+            if ($items.Length -le 1) { continue app }
             $selectedIndex = if ($selectedIndex -le 0) { $items.Length - 1 } else { $selectedIndex - 1 }
             Update-ItemList -items $items -selectedIndex $selectedIndex
         }
         ([UserAction]::NavigateDown) {
-            if ($items.Length -eq 0) { continue }
+            if ($items.Length -le 1) { continue app }
             $selectedIndex = ($selectedIndex + 1) % $items.Length
             Update-ItemList -items $items -selectedIndex $selectedIndex
         }
         ([UserAction]::OpenItem) {
-            if ($items.Length -eq 0) { continue }
+            if ($items.Length -eq 0) { continue app }
             $item = $items[$selectedIndex]
             if ($item.PSIsContainer) {
                 try {
                     Set-Location $item.FullName -ErrorAction Stop
                     $cwd = Get-Location
-                    $items = Get-ChildItem -Force | Sort-Object PSIsContainer, Name
+                    $items = @(Get-ChildItem | Sort-Object PSIsContainer, Name)
                     $selectedIndex = 0
 
                     Update-Header
                     Update-ItemList -items $items -selectedIndex $selectedIndex
                     Update-Message -msg "Entered folder: $($item.Name)"
                 } catch {
-                    Update-Message -msg "Cannot enter folder: $($item.Name) (access denied)"
+                    Update-Message -msg "[Error] Cannot enter folder: $($item.Name) (access denied)"
                 }
             } else {
-                Update-Message -msg "Cannot enter a file: $($item.Name)"
+                try {
+                    Invoke-Item $item.FullName -ErrorAction Stop
+                    Update-Message -msg "Opened file: $($item.Name)"
+                } catch {
+                    Update-Message -msg "[Error] Cannot open file: $($item.Name) (access denied)"
+                }
             }
         }
         ([UserAction]::GoToParent) {
@@ -212,34 +237,34 @@ while ($running) {
             if ($parent) {
                 Set-Location $parent
                 $cwd = Get-Location
-                $items = Get-ChildItem -Force | Sort-Object PSIsContainer, Name
+                $items = Get-ChildItem | Sort-Object PSIsContainer, Name
                 $selectedIndex = 0
 
                 Update-Header
                 Update-ItemList -items $items -selectedIndex $selectedIndex
                 Update-Message -msg "Moved to parent folder"
             } else {
-                Update-Message -msg "Already at root directory."
+                Update-Message -msg "[Warning] Already at root directory."
             }
         }
         ([UserAction]::DeleteItem) {
-            if ($items.Length -eq 0) { continue }
+            if ($items.Length -eq 0) { continue app }
             $item = $items[$selectedIndex]
 
-            Update-Message -msg "Press DELETE again to confirm deletion of '$($item.Name)'"
+            Update-Message -msg "[Warning] Press DELETE again to confirm deletion of '$($item.Name)'"
 
             $confirmKey = [Console]::ReadKey($true)
             if ($confirmKey.Key -ne 'Delete') {
-                Update-Message -msg "Deletion cancelled."
-                continue
+                Update-Message -msg "[Warning] Deletion cancelled."
+                continue app
             }
 
             try {
                 if ($item.PSIsContainer) {
-                    $childCount = (Get-ChildItem -LiteralPath $item.FullName -Force -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
+                    $childCount = (Get-ChildItem -LiteralPath $item.FullName -Recurse -ErrorAction SilentlyContinue | Measure-Object).Count
                     if ($childCount -gt 0) {
-                        Update-Message -msg "Folder '$($item.Name)' is not empty - only empty folders can be deleted."
-                        continue
+                        Update-Message -msg "[Warning] Folder '$($item.Name)' is not empty - only empty folders can be deleted."
+                        continue app
                     }
                     Remove-Item -LiteralPath $item.FullName -Force -ErrorAction Stop
                     Update-Message -msg "Folder '$($item.Name)' deleted."
@@ -248,13 +273,13 @@ while ($running) {
                     Update-Message -msg "File '$($item.Name)' deleted."
                 }
 
-                $items = Get-ChildItem -Force | Sort-Object PSIsContainer, Name
+                $items = Get-ChildItem | Sort-Object PSIsContainer, Name
                 if ($selectedIndex -ge $items.Length -and $items.Length -gt 0) {
                     $selectedIndex = $items.Length - 1
                 }
                 Update-ItemList -items $items -selectedIndex $selectedIndex
             } catch {
-                Update-Message -msg "Error deleting '$($item.Name)': $($_.Exception.Message)"
+                Update-Message -msg "[Error] deleting '$($item.Name)': $($_.Exception.Message)"
             }
         }
         ([UserAction]::Exit) {
@@ -263,6 +288,8 @@ while ($running) {
 }
 }
 
-[Console]::Clear()
+# [Console]::Clear()
 [Console]::CursorVisible = $true
+[Console]::ForegroundColor = $theme.DF.Foreground
+[Console]::BackgroundColor = $theme.DF.Background
 Write-Host "Goodbye!" -ForegroundColor Green
