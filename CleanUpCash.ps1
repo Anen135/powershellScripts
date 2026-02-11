@@ -33,7 +33,9 @@ $totalFoldersDeleted = 0
 $totalErrors = 0
 $failedItems = @()
 
-foreach ($path in $paths) {
+foreach ($rawPath in $paths) {
+    $path = [System.Environment]::ExpandEnvironmentVariables($rawPath)
+    if (-not ([System.IO.Path]::IsPathRooted($path))) { $path = Join-Path $PathsFileDir $path }
     $item = Get-Item $path -ErrorAction SilentlyContinue
     if (-not $item) {
         Write-Warning "Путь не существует: $path"
