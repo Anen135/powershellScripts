@@ -79,8 +79,8 @@ function Get-UILayout {
 
 function Clear-Line {
     param([int]$line)
-    # [Console]::SetCursorPosition(0, $line)
-    # [Console]::Write(" " * ([Console]::WindowWidth - 1))
+    [Console]::SetCursorPosition(0, $line)
+    [Console]::Write(" " * ([Console]::WindowWidth - 1))
 }
 
 function Update-Header {
@@ -181,7 +181,7 @@ function Update-Footer {
 }
 
 
-# [Console]::Clear()
+[Console]::Clear()
 Update-Header
 Update-Separator
 Update-ItemList -items $items -selectedIndex $selectedIndex
@@ -288,7 +288,7 @@ $running = $true
 }
 }
 
-# [Console]::Clear()
+[Console]::Clear()
 [Console]::CursorVisible = $true
 [Console]::ForegroundColor = $theme.DF.Foreground
 [Console]::BackgroundColor = $theme.DF.Background
