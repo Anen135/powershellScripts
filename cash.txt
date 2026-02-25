@@ -1,9 +1,82 @@
+# --- БАЗОВЫЕ системные временные папки (включая альтернативы) ---
 %TEMP%
+%TMP%
+%SystemRoot%\Temp
+%USERPROFILE%\AppData\Local\Temp
+%LOCALAPPDATA%\Temp
+
+# --- БРАУЗЕРЫ (Cache, Code Cache, GPUCache, Service Worker) ---
 %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache
 %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache\Cache_Data
-%LOCALAPPDATA%\npm-cache
-%LOCALAPPDATA%\JetBrains\PyCharm2025.2\caches
-%LOCALAPPDATA%\FakePath\
-%LOCALAPPDATA%\Package Cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\GPUCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker\CacheStorage
+
+%LOCALAPPDATA%\Google\Chrome\User Data\Default\Code Cache\js
+%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache
+%LOCALAPPDATA%\Google\Chrome\User Data\Default\GPUCache
+%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker\CacheStorage
+
+%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache
+%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache
+%LOCALAPPDATA%\Chromium\User Data\Default\Cache
+
+# Firefox: замените <profile> на имя профиля (или добавьте несколько строк для каждого профиля)
+# %APPDATA%\Mozilla\Firefox\Profiles\<profile>\cache2
+# %LOCALAPPDATA%\Mozilla\Firefox\Profiles\<profile>\cache2
+
+# Opera / Opera GX
+%LOCALAPPDATA%\Opera Software\Opera Stable\Cache
+%LOCALAPPDATA%\Opera Software\Opera Stable\Code Cache
 %LOCALAPPDATA%\Opera Software\Opera GX Stable\Default\Cache
 %APPDATA%\Opera Software\Opera GX Stable\Default\Code Cache
+
+# --- РАЗРАБОТЧИКИ / IDE / РЕДАКТОРЫ ---
+# JetBrains (PyCharm, IntelliJ и т.д.)
+# Можно будет использовать когда добавлю маски
+#%LOCALAPPDATA%\JetBrains\PyCharm<version>\caches
+#%LOCALAPPDATA%\JetBrains\Toolbox\apps\* \caches
+# Visual Studio Code
+%APPDATA%\Code\Cache
+%USERPROFILE%\.vscode\cached-data
+
+# --- Менеджеры пакетов и кэши сборок ---
+%LOCALAPPDATA%\npm-cache
+%APPDATA%\npm-cache
+%USERPROFILE%\.npm
+%USERPROFILE%\.cache\pip
+%LOCALAPPDATA%\Yarn\Cache
+%USERPROFILE%\.yarn\cache
+%USERPROFILE%\.pnpm-store
+# pnpm / yarn / pip — при необходимости добавьте альтернативные пути
+
+# --- Мессенджеры и клиенты ---
+%LOCALAPPDATA%\Discord\Cache
+%APPDATA%\discord\Cache
+%LOCALAPPDATA%\slack\Cache
+%APPDATA%\slack\Cache
+%LOCALAPPDATA%\Microsoft\Teams\Cache
+%LOCALAPPDATA%\Microsoft\Teams\IndexedDB
+
+# --- Игровые и мультимедиа клиенты ---
+%ProgramFiles(x86)%\Steam\appcache
+%LOCALAPPDATA%\Spotify\Storage
+
+# --- Системные кэши и миниатюры (Проверьте перед удалением!) ---
+%LOCALAPPDATA%\Microsoft\Windows\Explorer
+%LOCALAPPDATA%\Microsoft\Windows\INetCache
+%LOCALAPPDATA%\Microsoft\Windows\Temporary Internet Files
+
+# --- Дополнительные (включите по необходимости) ---
+# Windows Update download — Требует прав администратора
+#%WINDIR%\SoftwareDistribution\Download
+
+# Prefetch — Не обязательно чистить часто
+#%SystemRoot%\Prefetch
+
+# ПРИМЕЧАНИЯ:
+# - Строки, начинающиеся с #, игнорируются скриптом (комментарии).
+# - Замените <profile> и <version> на реальные значения, если хотите — иначе оставьте строку закомментированной или добавьте конкретные пути.
+# - Некоторые пути требуют прав администратора; запускайте скрипт с WhatIf сначала для предпросмотра.
+# - Если хотите исключить какие-то приложения, закомментируйте соответствующие строки (добавьте # в начале).
+# - Маски временно не поддерживаются
