@@ -59,7 +59,7 @@ process {
     try {
         # 1. Инициализация git
         if (-not (Test-Path ".git")) {
-            git init | Out-Null
+            git init 
             Write-Output "Git инициализирован."
         }
         else {
@@ -67,12 +67,12 @@ process {
         }
 
         # 2. Добавление и коммит
-        git add . | Out-Null
+        git add . 
 
         # Проверим, есть ли что коммитить
         $status = git status --porcelain
         if ($status) {
-            git commit -m "Initial commit" | Out-Null
+            git commit -m "Initial commit" 
             Write-Output "Изменения закоммичены."
         }
         else {

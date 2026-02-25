@@ -9,6 +9,7 @@ public enum UserAction
     OpenItem,
     GoToParent,
     DeleteItem,
+    Search,
     Exit
 }
 "@ -ErrorAction SilentlyContinue
@@ -19,6 +20,7 @@ $keyToActionMap = @{
     'Enter'      = [UserAction]::OpenItem
     'Delete'     = [UserAction]::DeleteItem
     'Escape'     = [UserAction]::Exit
+    'Q'          = [UserAction]::Search
 
     'Backspace'  = [UserAction]::GoToParent
     'S'          = [UserAction]::GoToParent
@@ -38,28 +40,16 @@ $theme = @{
 
 function Get-UserActionFromKey {
     param([System.ConsoleKeyInfo]$key)
-
-    
     $consoleKeyStr = $key.Key.ToString()
     if ($keyToActionMap.ContainsKey($consoleKeyStr)) {
         return $keyToActionMap[$consoleKeyStr]
     }
-
-    
     $charStr = $key.KeyChar
     if ($charStr -ne 0 -and $keyToActionMap.ContainsKey($charStr)) {
         return $keyToActionMap[$charStr]
     }
-
-    
     return [UserAction]::None
 }
-
-
-[Console]::CursorVisible = $false
-$cwd = Get-Location
-$items = @(Get-ChildItem -ErrorAction Stop | Sort-Object PSIsContainer, Name)
-$selectedIndex = 0
 
 function Get-UILayout {
     $height = [Console]::WindowHeight
@@ -121,7 +111,8 @@ function Update-ItemList {
             $item = $items[$row]
             $prefix = if ($row -eq $selectedIndex) { "> " } else { "  " }
             $type = if ($item.PSIsContainer) { "[DIR] " } else { "[FILE] " }
-            $line = "$prefix$type$item"
+            $displayName = if ($inSearchMode) { $item.FullName } else { $item.Name }
+            $line = "$prefix$type$displayName"
             if ($line.Length -gt $layout.WindowWidth) {
                 $line = $line.Substring(0, $layout.WindowWidth)
             }
@@ -139,6 +130,40 @@ function Update-ItemList {
             [Console]::Write(" " * ($layout.WindowWidth - 1))
         }
     }
+}
+
+function Read-SearchMask {
+    $layout = Get-UILayout
+    $mask = ""
+
+    while ($true) {
+        Clear-Line $layout.MessageLine
+        [Console]::SetCursorPosition(0, $layout.MessageLine)
+        Write-Host "Search mask: $mask" -ForegroundColor Cyan -NoNewline
+
+        $key = [Console]::ReadKey($true)
+
+        switch ($key.Key) {
+            'Escape' { return $null }
+            'Enter'  { return $mask }
+            'Backspace' {
+                if ($mask.Length -gt 0) {
+                    $mask = $mask.Substring(0, $mask.Length - 1)
+                }
+            }
+            default {
+                if ($key.KeyChar -ne 0) {
+                    $mask += $key.KeyChar
+                }
+            }
+        }
+    }
+}
+
+function Find-FilesByMask {
+    param( [string]$StartPath, [string]$Mask )
+    try { Get-ChildItem -Path $StartPath -Recurse -File -Filter $Mask -ErrorAction SilentlyContinue } 
+    catch { @() }
 }
 
 function Update-Message {
@@ -170,7 +195,7 @@ function Update-Hint {
     $layout = Get-UILayout
     Clear-Line $layout.HintLine
     [Console]::SetCursorPosition(0, $layout.HintLine)
-    $hint = "Arrows: navigate (cyclic) | Enter: open folder | S: parent | Del: delete | Esc: exit"
+    $hint = "Arrows: navigate (cyclic) | Enter: open | S: parent | Del: delete | Esc: exit | Slash: search"
     Write-Host $hint -ForegroundColor Yellow -NoNewline
     [Console]::Write(" " * ($layout.WindowWidth - $hint.Length - 1))
 }
@@ -180,8 +205,15 @@ function Update-Footer {
     Clear-Line $layout.FooterLine
 }
 
-
+[Console]::CursorVisible = $false
 [Console]::Clear()
+
+$cwd = Get-Location
+$items = @(Get-ChildItem -ErrorAction Stop | Sort-Object PSIsContainer, Name)
+$normalItems = $null
+$inSearchMode = $false
+$selectedIndex = 0
+
 Update-Header
 Update-Separator
 Update-ItemList -items $items -selectedIndex $selectedIndex
@@ -210,6 +242,20 @@ $running = $true
         ([UserAction]::OpenItem) {
             if ($items.Length -eq 0) { continue app }
             $item = $items[$selectedIndex]
+            if ($inSearchMode) {
+                $targetDir = Split-Path $item.FullName -Parent
+
+                Set-Location $targetDir
+                $cwd = Get-Location
+                $items = @(Get-ChildItem | Sort-Object PSIsContainer, Name)
+                $selectedIndex = 0
+                $inSearchMode = $false
+
+                Update-Header
+                Update-ItemList -items $items -selectedIndex $selectedIndex
+                Update-Message "Jumped to: $targetDir"
+                continue app
+            }
             if ($item.PSIsContainer) {
                 try {
                     Set-Location $item.FullName -ErrorAction Stop
@@ -282,10 +328,43 @@ $running = $true
                 Update-Message -msg "[Error] deleting '$($item.Name)': $($_.Exception.Message)"
             }
         }
-        ([UserAction]::Exit) {
-            $running = $false
+        ([UserAction]::Search) {
+            $mask = Read-SearchMask
+            if (-not $mask) {
+                Update-Message "[Warning] Search cancelled"
+                continue app
+            }
+
+            Update-Message "[Info] Searching..."
+
+            $results = @(Find-FilesByMask -StartPath $cwd -Mask $mask)
+
+            if ($results.Count -eq 0) {
+                Update-Message "[Warning] No files found"
+                continue app
+            }
+
+            $normalItems = $items
+            $items = $results
+            $selectedIndex = 0
+            $inSearchMode = $true
+
+            Update-Header
+            Update-ItemList -items $items -selectedIndex $selectedIndex
+            Update-Message "[Info] Found $($items.Count) item(s)"
         }
-}
+        ([UserAction]::Exit) {
+            if ($inSearchMode) {
+                $items = $normalItems
+                $selectedIndex = 0
+                $inSearchMode = $false
+                Update-ItemList -items $items -selectedIndex $selectedIndex
+                Update-Message "[Info] Search mode exited"
+            } else {
+                $running = $false
+            }
+        }
+    }
 }
 
 [Console]::Clear()
