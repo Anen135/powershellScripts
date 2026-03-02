@@ -1,4 +1,20 @@
 # === PATH Editor ===
+param( [switch]$Current )
+if ($Current) {
+    $currentPath = (Get-Location).Path
+
+    $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
+
+    if ($userPath -split ";" | Where-Object { $_ -eq $currentPath }) { Write-Host "Path already exists in PATH." -ForegroundColor Yellow }
+    else {
+        $newPath = "$userPath;$currentPath"
+        [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+        Write-Host "Added to PATH: $currentPath" -ForegroundColor Green
+        $env:Path = [Environment]::GetEnvironmentVariable("Path", "User") 
+    }
+
+    return
+}
 
 $paths = ($env:Path -split ';') | Where-Object { $_ -and $_.Trim() }
 $paths += ""  # пустая строка для добавления новой
@@ -13,7 +29,7 @@ function Get-UILayout {
         HeaderLine     = 0
         SeparatorLine  = 1
         ListStart      = 2
-        ListLines      = [Math]::Max(5, $height - 8)  # оставляем место: заголовок, разделитель, 2 строки ввода, сообщение, подсказка
+        ListLines      = [Math]::Max(5, $height - 8)  # заголовок, разделитель, 2 строки ввода, сообщение, подсказка
         EditLabelLine  = $height - 6                 # "Editing: ..."
         EditInputLine  = $height - 5                 # строка ввода
         MessageLine    = $height - 3
@@ -39,7 +55,7 @@ function Show-PathList {
     $maxLines = $layout.ListLines
     $half = [Math]::Floor($maxLines / 2)
     $start = [Math]::Max(0, $selectedIndex - $half)
-    if ($start + $maxLines > $paths.Length) {
+    if ($start + $maxLines -gt $paths.Length) {
         $start = [Math]::Max(0, $paths.Length - $maxLines)
     }
 
@@ -57,7 +73,7 @@ function Show-PathList {
     }
 }
 
-function Draw-UI {
+function Show-UI {
     param(
         [string[]]$paths,
         [int]$selectedIndex,
@@ -109,7 +125,7 @@ function Draw-UI {
 $running = $true
 
 while ($running) {
-    Draw-UI -paths $paths -selectedIndex $selectedIndex -message $message
+    Show-UI -paths $paths -selectedIndex $selectedIndex -message $message
     $message = $null
 
     $key = [Console]::ReadKey($true)
@@ -158,6 +174,7 @@ while ($running) {
         'S' {
             $cleanPaths = $paths | Where-Object { $_ -and $_.Trim() }
             [Environment]::SetEnvironmentVariable("Path", ($cleanPaths -join ';'), "User")
+            $env:Path = [Environment]::GetEnvironmentVariable("Path", "User")
             $message = "PATH saved successfully (User scope). Restart apps or logoff to apply."
         }
 
