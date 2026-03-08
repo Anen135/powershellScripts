@@ -89,10 +89,7 @@ function Update-Separator {
 }
 
 function Update-ItemList {
-    param(
-        [System.IO.FileSystemInfo[]]$items,
-        [int]$selectedIndex
-    )
+    param( [System.IO.FileSystemInfo[]]$items, [int]$selectedIndex )
     $layout = Get-UILayout
     $top = $layout.ListStart
     $maxLines = $layout.ListLines
@@ -209,7 +206,7 @@ function Update-Footer {
 [Console]::Clear()
 
 $cwd = Get-Location
-$items = @(Get-ChildItem -ErrorAction Stop | Sort-Object PSIsContainer, Name)
+$items = @(Get-ChildItem -ErrorAction Stop | Sort-Object @{Expression='PSIsContainer';Descending=$true}, Name)
 $normalItems = $null
 $inSearchMode = $false
 $selectedIndex = 0
@@ -247,7 +244,7 @@ $running = $true
 
                 Set-Location $targetDir
                 $cwd = Get-Location
-                $items = @(Get-ChildItem | Sort-Object PSIsContainer, Name)
+                $items = @(Get-ChildItem | Sort-Object @{Expression='PSIsContainer';Descending=$true}, Name)
                 $selectedIndex = 0
                 $inSearchMode = $false
 
@@ -260,7 +257,7 @@ $running = $true
                 try {
                     Set-Location $item.FullName -ErrorAction Stop
                     $cwd = Get-Location
-                    $items = @(Get-ChildItem | Sort-Object PSIsContainer, Name)
+                    $items = @(Get-ChildItem | Sort-Object @{Expression='PSIsContainer';Descending=$true}, Name)
                     $selectedIndex = 0
 
                     Update-Header
@@ -283,7 +280,7 @@ $running = $true
             if ($parent) {
                 Set-Location $parent
                 $cwd = Get-Location
-                $items = Get-ChildItem | Sort-Object PSIsContainer, Name
+                $items = Get-ChildItem | Sort-Object @{Expression='PSIsContainer';Descending=$true}, Name
                 $selectedIndex = 0
 
                 Update-Header
@@ -319,7 +316,7 @@ $running = $true
                     Update-Message -msg "File '$($item.Name)' deleted."
                 }
 
-                $items = Get-ChildItem | Sort-Object PSIsContainer, Name
+                $items = Get-ChildItem | Sort-Object @{Expression='PSIsContainer';Descending=$true}, Name
                 if ($selectedIndex -ge $items.Length -and $items.Length -gt 0) {
                     $selectedIndex = $items.Length - 1
                 }
