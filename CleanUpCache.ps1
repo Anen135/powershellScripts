@@ -1,22 +1,16 @@
-﻿# CleanUpCash.ps1
-# Скрипт для безопасной очистки папок и файлов из списка
-# Продолжает удаление даже если некоторые файлы/папки заняты
+﻿# CleanUpCache.ps1
 
 param(
-    [string]$PathsFile = "C:\Program Files\WindowsPowerShell\Scripts\cash.txt",  # Файл со списком путей
-    [switch]$WhatIf                    # Режим предпросмотра
+    [string]$PathsFile = "C:\Program Files\WindowsPowerShell\Scripts\cache.txt", 
+    [switch]$WhatIf                   
 )
 
-# Проверка файла со списком
 if (-not (Test-Path $PathsFile)) {
     Write-Error "Файл со списком путей не найден: $PathsFile"
     exit 1
 }
 
-# Папка файла списка, чтобы корректно обрабатывать относительные пути
 $PathsFileDir = Split-Path -Parent $PathsFile
-
-# Чтение путей, удаление кавычек, игнорирование пустых строк и комментариев
 $paths = Get-Content $PathsFile | ForEach-Object { $_.Trim().Trim('"') } | Where-Object { $_ -ne "" -and -not $_.StartsWith("#") }
 
 if ($paths.Count -eq 0) {
@@ -26,8 +20,6 @@ if ($paths.Count -eq 0) {
 
 Write-Host "Найдено $($paths.Count) пут(ей) для очистки." -ForegroundColor Cyan
 if ($WhatIf) { Write-Host "Режим WhatIf: ничего не будет удалено, только предпросмотр." -ForegroundColor Yellow }
-
-# Статистика
 $totalFilesDeleted = 0
 $totalFoldersDeleted = 0
 $totalErrors = 0
@@ -79,8 +71,6 @@ foreach ($rawPath in $paths) {
         $failedItems += $path
     }
 }
-
-# Итоги
 Write-Host "`nОчистка завершена!" -ForegroundColor Cyan
 Write-Host "Файлов удалено: $totalFilesDeleted" -ForegroundColor Yellow
 Write-Host "Папок удалено: $totalFoldersDeleted" -ForegroundColor Yellow

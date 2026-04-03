@@ -1,82 +1,504 @@
-# --- БАЗОВЫЕ системные временные папки (включая альтернативы) ---
-%TEMP%
-%TMP%
-%SystemRoot%\Temp
-%USERPROFILE%\AppData\Local\Temp
-%LOCALAPPDATA%\Temp
+# --- ДОПОЛНИТЕЛЬНЫЕ системные временные папки и кэши ---
+%LOCALAPPDATA%\cache
+%LOCALAPPDATA%\D3DSCache
+%LOCALAPPDATA%\Package Cache
+%LOCALAPPDATA%\AMD\DxCache
+%LOCALAPPDATA%\AMD\DxcCache
+%LOCALAPPDATA%\AMD\OglCache
+%LOCALAPPDATA%\AMD\VkCache
+%LOCALAPPDATA%\AMD\Radeonsoftware\cache
+%LOCALAPPDATA%\AMDSoftwareInstaller\cache
+%LOCALAPPDATA%\AMDSoftwareInstaller\cache\qmlcache
+%LOCALAPPDATA%\Google\YAPF\Cache
+%LOCALAPPDATA%\Microsoft\IdentityCache
+%LOCALAPPDATA%\Microsoft\Azure DevOps\12.0\Cache
+%LOCALAPPDATA%\Microsoft\Azure DevOps\8.0\Cache
+%LOCALAPPDATA%\Microsoft\TokenBroker\Cache
+%LOCALAPPDATA%\NuGet\v3-cache
+%LOCALAPPDATA%\OneDrive\cache
+%LOCALAPPDATA%\OneDrive\cache\qmlcache
+%LOCALAPPDATA%\pip\cache
+%LOCALAPPDATA%\Unity\cache
+%LOCALAPPDATA%\Unity\Caches
+%LOCALAPPDATA%\Xamarin\iOS\Caches
 
-# --- БРАУЗЕРЫ (Cache, Code Cache, GPUCache, Service Worker) ---
-%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache
-%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache\Cache_Data
+# --- БРАУЗЕРЫ / WEBVIEW / RENDER CACHE ---
+%LOCALAPPDATA%\Microsoft\Edge\User Data\component_crx_cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\extensions_crx_cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\GraphiteDawnCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\GrShaderCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\ShaderCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\GrShaderCache\GPUCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\ShaderCache\GPUCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\AutofillAiModelCache
 %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\DawnWebGPUCache
 %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\GPUCache
-%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker\CacheStorage
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Service Worker\ScriptCache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Shared Dictionary\cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Storage\ext\ihmafllikibpmigkcoadcmckbfhibefp\def\Code Cache
+%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Storage\ext\ihmafllikibpmigkcoadcmckbfhibefp\def\GPUCache
 
-%LOCALAPPDATA%\Google\Chrome\User Data\Default\Code Cache\js
-%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache
-%LOCALAPPDATA%\Google\Chrome\User Data\Default\GPUCache
-%LOCALAPPDATA%\Google\Chrome\User Data\Default\Service Worker\CacheStorage
+%LOCALAPPDATA%\Microsoft\Internet Explorer\CacheStorage
 
-%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache
-%LOCALAPPDATA%\Vivaldi\User Data\Default\Cache
-%LOCALAPPDATA%\Chromium\User Data\Default\Cache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\component_crx_cache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\extensions_crx_cache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\ShaderCache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\AutofillAiModelCache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\Cache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Microsoft\Olk\EBWebView\Default\Shared Dictionary\cache
 
-# Firefox: замените <profile> на имя профиля (или добавьте несколько строк для каждого профиля)
-# %APPDATA%\Mozilla\Firefox\Profiles\<profile>\cache2
-# %LOCALAPPDATA%\Mozilla\Firefox\Profiles\<profile>\cache2
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\component_crx_cache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\extensions_crx_cache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\ShaderCache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\AutofillAiModelCache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\Cache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Microsoft\OneDrive\EBWebView\Default\Shared Dictionary\cache
 
-# Opera / Opera GX
-%LOCALAPPDATA%\Opera Software\Opera Stable\Cache
-%LOCALAPPDATA%\Opera Software\Opera Stable\Code Cache
+%LOCALAPPDATA%\Steam\htmlcache
+%LOCALAPPDATA%\Steam\htmlcache\GraphiteDawnCache
+%LOCALAPPDATA%\Steam\htmlcache\GrShaderCache
+%LOCALAPPDATA%\Steam\htmlcache\ShaderCache
+%LOCALAPPDATA%\Steam\htmlcache\Default\Cache
+%LOCALAPPDATA%\Steam\htmlcache\Default\Code Cache
+%LOCALAPPDATA%\Steam\htmlcache\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Steam\htmlcache\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Steam\htmlcache\Default\GPUCache
+%LOCALAPPDATA%\Steam\htmlcache\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Steam\htmlcache\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Steam\htmlcache\Default\Shared Dictionary\cache
+
+# --- РАЗРАБОТЧИКИ / IDE / ЭДИТОРЫ ---
+%LOCALAPPDATA%\Microsoft\TypeScript\5.9\node_modules\webpack\lib\cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\CacheService
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\17.0_e5c9ec0e\ComponentModelCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\17.0_e5c9ec0e\ItemTemplatesCache_{00000000-0000-0000-0000-000000000000}
+%LOCALAPPDATA%\Microsoft\VisualStudio\17.0_e5c9ec0e\PackageCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\17.0_e5c9ec0e\ProjectTemplatesCache_{00000000-0000-0000-0000-000000000000}
+%LOCALAPPDATA%\Microsoft\VisualStudio\17.0_e5c9ec0e\TextMateCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\17.0_e5c9ec0e\TemplateEngineHost\ReleaseCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\Roslyn\Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\component_crx_cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\extensions_crx_cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\ShaderCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\AutofillAiModelCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0000\EBWebView\Default\Shared Dictionary\cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\component_crx_cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\extensions_crx_cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\ShaderCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\AutofillAiModelCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Microsoft\VisualStudio\WebView2Cache\0001\EBWebView\Default\Shared Dictionary\cache
+%LOCALAPPDATA%\Microsoft\VisualStudio Services\11.0\Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio Services\12.0\Cache
+%LOCALAPPDATA%\Microsoft\VisualStudio Services\8.0\Cache
+
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\lru-cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\@azure\msal-browser\dist\cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\@azure\msal-browser\dist\custom-auth-path\cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\@azure\msal-common\dist\cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\@azure\msal-node\dist\cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\@connectrpc\connect-node\node_modules\undici\lib\cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\@vscode\vsce\node_modules\lru-cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\font-ligatures\node_modules\lru-cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\path-scurry\node_modules\lru-cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\undici\lib\cache
+%LOCALAPPDATA%\Programs\cursor\resources\app\node_modules\undici\lib\web\cache
+
+%LOCALAPPDATA%\Programs\Microsoft VS Code\e7fb5e96c0\resources\app\node_modules\@xterm\addon-ligatures\node_modules\lru-cache
+%LOCALAPPDATA%\Programs\Microsoft VS Code\e7fb5e96c0\resources\app\node_modules\undici\lib\cache
+%LOCALAPPDATA%\Programs\Microsoft VS Code\e7fb5e96c0\resources\app\node_modules\undici\lib\web\cache
+
+%LOCALAPPDATA%\Python\_cache
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\collections\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\encodings\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\importlib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\json\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\re\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\site-packages\pip\_vendor\cachecontrol
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\site-packages\pip\_vendor\cachecontrol\caches
+%LOCALAPPDATA%\Python\pythoncore-3.13-64\Lib\site-packages\pip-25.3.dist-info\licenses\src\pip\_vendor\cachecontrol
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\asyncio\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\collections\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\compression\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\compression\zstd\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\compression\_common\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\concurrent\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\concurrent\futures\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\ctypes\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\email\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\encodings\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\ensurepip\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\html\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\http\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\importlib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\importlib\metadata\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\importlib\resources\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\json\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\logging\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\multiprocessing\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\pathlib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\re\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\cli\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\commands\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\locations\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\metadata\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\metadata\importlib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\models\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_internal\utils\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\cachecontrol
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\cachecontrol\caches
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\certifi\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\packaging\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\platformdirs\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pygments\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pygments\filters\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pygments\lexers\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pygments\styles\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pyproject_hooks\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\pyproject_hooks\_in_process\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip\_vendor\rich\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\site-packages\pip-25.3.dist-info\licenses\src\pip\_vendor\cachecontrol
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\sqlite3\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\string\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\sysconfig\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\tomllib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\unittest\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\urllib\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\venv\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\xml\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\xml\parsers\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\xmlrpc\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\zipfile\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\zipfile\_path\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\zoneinfo\__pycache__
+%LOCALAPPDATA%\Python\pythoncore-3.14-64\Lib\_pyrepl\__pycache__
+
+# --- МЕССЕНДЖЕРЫ / КЛИЕНТЫ / WEBVIEW-ХРАНИЛИЩА ---
+%LOCALAPPDATA%\Packages\38833FF26BA1D.UnigramPreview_g9c9v27vpyspw\LocalCache
+%LOCALAPPDATA%\Packages\38833FF26BA1D.UnigramPreview_g9c9v27vpyspw\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\cr.sb.cdm9BE8D466BE8DD8A1B5BCB0CC5066FE77C4E8F9F8\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\cr.sb.odmf5200eafd3ad904629cbb0f87a78a3c7211081fe\AC\AMD\DxcCache
+%LOCALAPPDATA%\Packages\Microsoft.549981C3F5F10_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.549981C3F5F10_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.549981C3F5F10_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.AAD.BrokerPlugin_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.CommandPalette_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.Copilot_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.GetHelp_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.LockApp_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.LockApp_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.Microsoft3DViewer_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.Microsoft3DViewer_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.Microsoft3DViewer_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\component_crx_cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\extensions_crx_cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\ShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\AutofillAiModelCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\Cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftOfficeHub_8wekyb3d8bbwe\LocalState\EBWebView\Default\Shared Dictionary\cache
+
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\AC\Microsoft\IdentityCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\Cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\ShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\AutofillAiModelCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\Cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\optimization_guide_hint_cache_store
+%LOCALAPPDATA%\Packages\Microsoft.MicrosoftSolitaireCollection_8wekyb3d8bbwe\LocalState\EBWebView\Default\Shared Dictionary\cache
+
+%LOCALAPPDATA%\Packages\Microsoft.MSPaint_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.ScreenSketch_8wekyb3d8bbwe\AC\AMD\DxCache
+
+%LOCALAPPDATA%\Packages\Microsoft.SkypeApp_kzf8qxf38zg5c\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.SkypeApp_kzf8qxf38zg5c\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.SkypeApp_kzf8qxf38zg5c\AC\TokenBroker\Cache
+
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\ShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\Default\Cache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Packages\Microsoft.Whiteboard_8wekyb3d8bbwe\LocalState\EBWebView\Default\Shared Dictionary\cache
+
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Apprep.ChxApp_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.CloudExperienceHost_cw5n1h2txyewy\AppData\CacheStorage
+%LOCALAPPDATA%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy\LocalState\TargetedContentCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Photos_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\AC\Microsoft\IdentityCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\AppData\CacheStorage
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\AppIconCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\DeviceSearchCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\component_crx_cache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\ShaderCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\Default\Cache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.Search_cw5n1h2txyewy\LocalState\EBWebView\Default\Shared Dictionary\cache
+
+%LOCALAPPDATA%\Packages\Microsoft.Windows.SecHealthUI_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.ShellExperienceHost_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.ShellExperienceHost_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache\perUserCache_0003400167FDC74B
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache\perUserCache_{Global}
+%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalCache
+
+%LOCALAPPDATA%\Packages\Microsoft.XboxApp_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.XboxGamingOverlay_8wekyb3d8bbwe\LocalCache
+%LOCALAPPDATA%\Packages\Microsoft.XboxGamingOverlay_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.XboxGamingOverlay_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.YourPhone_8wekyb3d8bbwe\LocalCache
+
+%LOCALAPPDATA%\Packages\Microsoft.ZuneMusic_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\Microsoft.ZuneVideo_8wekyb3d8bbwe\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\AMD\DxcCache
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\TokenBroker\Cache
+
+%LOCALAPPDATA%\Packages\microsoft.windows.authhost.a_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\microsoft.windowscommunicationsapps_8wekyb3d8bbwe\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\microsoft.windowscommunicationsapps_8wekyb3d8bbwe\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\microsoft.windowscommunicationsapps_8wekyb3d8bbwe\LocalState\AppData\Local\Office\16.0\WebServiceCache
+
+# --- МУЛЬТИМЕДИА / ИГРЫ / ПРОЧИЕ ЛОКАЛЬНЫЕ КЭШИ ---
 %LOCALAPPDATA%\Opera Software\Opera GX Stable\Default\Cache
-%APPDATA%\Opera Software\Opera GX Stable\Default\Code Cache
+%LOCALAPPDATA%\Opera Software\Opera GX Stable\Default\System Cache
+%LOCALAPPDATA%\Opera Software\Opera GX Stable\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Opera Software\Opera GX Stable\Default\System Cache\Cache_Data
+%LOCALAPPDATA%\Temp\node-compile-cache
+%LOCALAPPDATA%\Temp\SymbolCache
+%LOCALAPPDATA%\Temp\WinGet\cache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\GraphiteDawnCache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\GrShaderCache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\ShaderCache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\Default\Cache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\Default\Code Cache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\Default\DawnGraphiteCache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\Default\DawnWebGPUCache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\Default\GPUCache
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\Default\Cache\Cache_Data
+%LOCALAPPDATA%\Temp\WinRAR.exe.WebView2\EBWebView\Default\Shared Dictionary\cache
+%LOCALAPPDATA%\Xamarin\iOS\Caches
 
-# --- РАЗРАБОТЧИКИ / IDE / РЕДАКТОРЫ ---
-# JetBrains (PyCharm, IntelliJ и т.д.)
-# Можно будет использовать когда добавлю маски
-#%LOCALAPPDATA%\JetBrains\PyCharm<version>\caches
-#%LOCALAPPDATA%\JetBrains\Toolbox\apps\* \caches
-# Visual Studio Code
+# --- ДАННЫЕ В ROAMING ---
+%APPDATA%\Adobe\Adobe Photoshop 2023\CT Font Cache
+%APPDATA%\Adobe\Adobe Photoshop 2023\FontFeatureCache
+%APPDATA%\Adobe\Flash Player\NativeCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\component_crx_cache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\extensions_crx_cache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\GraphiteDawnCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\GrShaderCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\ShaderCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\AutofillAiModelCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\Cache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\Code Cache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\DawnGraphiteCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\DawnWebGPUCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\GPUCache
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\optimization_guide_hint_cache_store
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\Cache\Cache_Data
+%APPDATA%\Adobe\UXP\PluginsStorage\PHSP\24\Shared\EBWebView\Default\Shared Dictionary\cache
+
 %APPDATA%\Code\Cache
-%USERPROFILE%\.vscode\cached-data
+%APPDATA%\Code\CachedConfigurations
+%APPDATA%\Code\CachedData
+%APPDATA%\Code\CachedExtensionVSIXs
+%APPDATA%\Code\CachedProfilesData
+%APPDATA%\Code\Code Cache
+%APPDATA%\Code\DawnGraphiteCache
+%APPDATA%\Code\DawnWebGPUCache
+%APPDATA%\Code\GPUCache
+%APPDATA%\Code\Cache\Cache_Data
+%APPDATA%\Code\Service Worker\ScriptCache
+%APPDATA%\Code\Shared Dictionary\cache
+%APPDATA%\Code\User\globalStorage\blackboxapp.blackboxagent\cache
+%APPDATA%\Code\WebStorage\1\CacheStorage
+%APPDATA%\Code\WebStorage\2\CacheStorage
+%APPDATA%\Code\WebStorage\3\CacheStorage
+%APPDATA%\Code\WebStorage\4\CacheStorage
+%APPDATA%\Code\WebStorage\5\CacheStorage
+%APPDATA%\Code\WebStorage\6\CacheStorage
+%APPDATA%\Code\WebStorage\7\CacheStorage
+%APPDATA%\Code\WebStorage\8\CacheStorage
+%APPDATA%\Code\WebStorage\10\CacheStorage
+%APPDATA%\Code\WebStorage\11\CacheStorage
+%APPDATA%\Code\WebStorage\12\CacheStorage
+%APPDATA%\Code\WebStorage\13\CacheStorage
+%APPDATA%\Code\WebStorage\14\CacheStorage
+%APPDATA%\Code\WebStorage\17\CacheStorage
 
-# --- Менеджеры пакетов и кэши сборок ---
-%LOCALAPPDATA%\npm-cache
-%APPDATA%\npm-cache
-%USERPROFILE%\.npm
-%USERPROFILE%\.cache\pip
-%LOCALAPPDATA%\Yarn\Cache
-%USERPROFILE%\.yarn\cache
-%USERPROFILE%\.pnpm-store
-# pnpm / yarn / pip — при необходимости добавьте альтернативные пути
+%APPDATA%\Cursor\Cache
+%APPDATA%\Cursor\CachedData
+%APPDATA%\Cursor\CachedProfilesData
+%APPDATA%\Cursor\Code Cache
+%APPDATA%\Cursor\DawnGraphiteCache
+%APPDATA%\Cursor\DawnWebGPUCache
+%APPDATA%\Cursor\GPUCache
+%APPDATA%\Cursor\Cache\Cache_Data
+%APPDATA%\Cursor\Shared Dictionary\cache
 
-# --- Мессенджеры и клиенты ---
-%LOCALAPPDATA%\Discord\Cache
 %APPDATA%\discord\Cache
-%LOCALAPPDATA%\slack\Cache
-%APPDATA%\slack\Cache
-%LOCALAPPDATA%\Microsoft\Teams\Cache
-%LOCALAPPDATA%\Microsoft\Teams\IndexedDB
+%APPDATA%\discord\Code Cache
+%APPDATA%\discord\DawnGraphiteCache
+%APPDATA%\discord\DawnWebGPUCache
+%APPDATA%\discord\GPUCache
+%APPDATA%\discord\Cache\Cache_Data
+%APPDATA%\discord\Service Worker\CacheStorage
+%APPDATA%\discord\Shared Dictionary\cache
 
-# --- Игровые и мультимедиа клиенты ---
-%ProgramFiles(x86)%\Steam\appcache
-%LOCALAPPDATA%\Spotify\Storage
+%APPDATA%\Godot\app_userdata\Buckshot Roulette\shader_cache
+%APPDATA%\Henry++\Mem Reduct\cache
+%APPDATA%\NCALayer\ncalayer-cache
+%APPDATA%\npm\node_modules\vsce\node_modules\lru-cache
+%APPDATA%\npm\node_modules\vsce\node_modules\undici\lib\cache
+%APPDATA%\npm\node_modules\vsce\node_modules\undici\lib\web\cache
 
-# --- Системные кэши и миниатюры (Проверьте перед удалением!) ---
-%LOCALAPPDATA%\Microsoft\Windows\Explorer
-%LOCALAPPDATA%\Microsoft\Windows\INetCache
-%LOCALAPPDATA%\Microsoft\Windows\Temporary Internet Files
+%APPDATA%\obsidian\Cache
+%APPDATA%\obsidian\Code Cache
+%APPDATA%\obsidian\DawnGraphiteCache
+%APPDATA%\obsidian\DawnWebGPUCache
+%APPDATA%\obsidian\GPUCache
+%APPDATA%\obsidian\Cache\Cache_Data
+%APPDATA%\obsidian\Shared Dictionary\cache
 
-# --- Дополнительные (включите по необходимости) ---
-# Windows Update download — Требует прав администратора
-#%WINDIR%\SoftwareDistribution\Download
+%APPDATA%\Opera Software\Opera GX Stable\component_crx_cache
+%APPDATA%\Opera Software\Opera GX Stable\extensions_crx_cache
+%APPDATA%\Opera Software\Opera GX Stable\GraphiteDawnCache
+%APPDATA%\Opera Software\Opera GX Stable\GrShaderCache
+%APPDATA%\Opera Software\Opera GX Stable\ShaderCache
+%APPDATA%\Opera Software\Opera GX Stable\Default\Code Cache
+%APPDATA%\Opera Software\Opera GX Stable\Default\DawnGraphiteCache
+%APPDATA%\Opera Software\Opera GX Stable\Default\DawnWebGPUCache
+%APPDATA%\Opera Software\Opera GX Stable\Default\GPUCache
+%APPDATA%\Opera Software\Opera GX Stable\Default\wallpapers_cache
+%APPDATA%\Opera Software\Opera GX Stable\Default\Service Worker\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\Service Worker\ScriptCache
+%APPDATA%\Opera Software\Opera GX Stable\Default\Shared Dictionary\cache
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\118\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\122\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\123\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\124\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\128\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\133\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\145\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\162\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\163\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\166\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\174\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\83\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\91\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\97\CacheStorage
+%APPDATA%\Opera Software\Opera GX Stable\Default\WebStorage\99\CacheStorage
 
-# Prefetch — Не обязательно чистить часто
-#%SystemRoot%\Prefetch
+%APPDATA%\UnityHub\Cache
+%APPDATA%\UnityHub\Code Cache
+%APPDATA%\UnityHub\DawnGraphiteCache
+%APPDATA%\UnityHub\DawnWebGPUCache
+%APPDATA%\UnityHub\GPUCache
+%APPDATA%\UnityHub\graphqlCache
+%APPDATA%\UnityHub\Cache\Cache_Data
+%APPDATA%\UnityHub\Shared Dictionary\cache
+%APPDATA%\UnityHub\WebStorage\1\CacheStorage
 
-# ПРИМЕЧАНИЯ:
-# - Строки, начинающиеся с #, игнорируются скриптом (комментарии).
-# - Замените <profile> и <version> на реальные значения, если хотите — иначе оставьте строку закомментированной или добавьте конкретные пути.
-# - Некоторые пути требуют прав администратора; запускайте скрипт с WhatIf сначала для предпросмотра.
-# - Если хотите исключить какие-то приложения, закомментируйте соответствующие строки (добавьте # в начале).
-# - Маски временно не поддерживаются
+# --- СИСТЕМНЫЕ КЭШИ И МИНИАТЮРЫ ---
+%LOCALAPPDATA%\Microsoft\Windows\ActionCenterCache
+%LOCALAPPDATA%\Microsoft\Windows\Caches
+%LOCALAPPDATA%\Microsoft\Windows\PPBCompatCache
+%LOCALAPPDATA%\Microsoft\Windows\PPBCompatUaCache
+%LOCALAPPDATA%\Microsoft\Windows\Explorer\IconCacheToDelete
+%LOCALAPPDATA%\Microsoft\Windows\Explorer\ThumbCacheToDelete
+
+# --- ДОПОЛНИТЕЛЬНЫЕ ПУТИ В UWP / LOCAL CACHE ---
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache\perUserCache_0003400167FDC74B
+%LOCALAPPDATA%\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalCache\perUserCache_{Global}
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\AMD\DxCache
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\AMD\DxcCache
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\Microsoft\CryptnetUrlCache
+%LOCALAPPDATA%\Packages\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\AC\TokenBroker\Cache
+%LOCALAPPDATA%\Packages\Microsoft.WindowsFeedbackHub_8wekyb3d8bbwe\AC\AMD\DxCache
