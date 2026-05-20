@@ -192,7 +192,7 @@ function Update-Hint {
     $layout = Get-UILayout
     Clear-Line $layout.HintLine
     [Console]::SetCursorPosition(0, $layout.HintLine)
-    $hint = "Arrows: navigate (cyclic) | Enter: open | S: parent | Del: delete | Esc: exit | Slash: search"
+    $hint = "Arrows: navigate (cyclic) | Enter: open | S: parent | Del: delete | Esc: exit | Q: search"
     Write-Host $hint -ForegroundColor Yellow -NoNewline
     [Console]::Write(" " * ($layout.WindowWidth - $hint.Length - 1))
 }

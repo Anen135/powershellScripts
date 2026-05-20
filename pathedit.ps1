@@ -1,5 +1,5 @@
 # === PATH Editor ===
-param( [switch]$Current )
+param( [switch]$Current, [string]$Find)
 if ($Current) {
     $currentPath = (Get-Location).Path
 
@@ -12,9 +12,21 @@ if ($Current) {
         Write-Host "Added to PATH: $currentPath" -ForegroundColor Green
         $env:Path = [Environment]::GetEnvironmentVariable("Path", "User") 
     }
-
     return
 }
+
+ if ($Find) {
+    $searhPath = $Find.Trim().Trim('"')
+    $currentPaths = $env:Path -split ';' | Where-Object { $_ }
+    if ($currentPaths -contains $searhPath) {
+        Write-Host "SUCCESS: Path '$searhPath' is already in PATH."
+    }
+    else {
+        Write-Host "NOT FOUND: Path '$searhPath' is NOT in PATH." -ForegroundColor Red
+        exit 1
+    }
+    return
+ }
 
 $paths = ($env:Path -split ';') | Where-Object { $_ -and $_.Trim() }
 $paths += ""  # пустая строка для добавления новой
