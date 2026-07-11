@@ -15,7 +15,7 @@ $DefaultGateway = ""  # If empty — determines automatically
 
 function Get-DefaultGateway {
     # Primary IPv4 gateway
-    $gw = (Get-NetRoute -DestinationPrefix 0.0.0.0/0 -ErrorAction SilentlyContinue | Sort-Object RouteMetric | Select-Object -First 1).NextHop
+    $gw = (Get-NetRoute -De stinationPrefix 0.0.0.0/0 -ErrorAction SilentlyContinue | Sort-Object RouteMetric | Select-Object -First 1).NextHop
     
     if (-not $gw) {
         $gw = (Get-NetIPConfiguration -ErrorAction SilentlyContinue | Where-Object IPv4DefaultGateway | Select-Object -First 1).IPv4DefaultGateway.NextHop
@@ -37,49 +37,63 @@ if (-not $DefaultGateway) {
 
 function Add-Bypass {
     param([string]$Target)
-    if ($Target -match '^[a-zA-Z]') {  # Domain
-        try {
-            $ips = [System.Net.Dns]::GetHostAddresses($Target) | 
-                   Where-Object { $_.AddressFamily -eq 'InterNetwork' }
-            
-            foreach ($ip in $ips) {
-                $ipStr = $ip.IPAddressToString
-                route -p add $ipStr mask 255.255.255.255 $DefaultGateway *>$null
-                Write-Host "Added: $ipStr  ← $Target" -ForegroundColor Green
-            }
-        } catch {
-            Write-Host "Could not resolve domain: $Target" -ForegroundColor Red
-        }
-    } 
-    else {  # IP
+
+    $ipObj = $null
+    $isIPv4 = [System.Net.IPAddress]::TryParse($Target, [ref]$ipObj) -and $ipObj.AddressFamily -eq 'InterNetwork'
+
+    if ($isIPv4) {
         route -p add $Target mask 255.255.255.255 $DefaultGateway *>$null
         if ($LASTEXITCODE -eq 0) {
             Write-Host "Added: $Target" -ForegroundColor Green
         } else {
             Write-Host "Error adding $Target" -ForegroundColor Red
         }
+    } 
+    else {
+        try {
+            $ips = [System.Net.Dns]::GetHostAddresses($Target) | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
+            
+            if ($ips) {
+                foreach ($ip in $ips) {
+                    $ipStr = $ip.IPAddressToString
+                    route -p add $ipStr mask 255.255.255.255 $DefaultGateway *>$null
+                    Write-Host "Added: $ipStr  ← $Target" -ForegroundColor Green
+                }
+            } else {
+                Write-Host "Domain resolved, but no IPv4 addresses found for: $Target" -ForegroundColor Yellow
+            }
+        } catch {
+            Write-Host "Could not resolve domain: $Target" -ForegroundColor Red
+        }
     }
 }
 
 function Remove-Bypass {
     param([string]$Target)
-    if ($Target -match '^[a-zA-Z]') {
-        try {
-            $ips = [System.Net.Dns]::GetHostAddresses($Target) | 
-                   Where-Object { $_.AddressFamily -eq 'InterNetwork' }
-            
-            foreach ($ip in $ips) {
-                $ipStr = $ip.IPAddressToString
-                route delete $ipStr *>$null
-                Write-Host "Removed: $ipStr" -ForegroundColor Yellow
-            }
-        } catch {
-            Write-Host "Could not process domain: $Target" -ForegroundColor Red
-        }
-    } 
-    else {
+
+    $ipObj = $null
+    $isIPv4 = [System.Net.IPAddress]::TryParse($Target, [ref]$ipObj) -and $ipObj.AddressFamily -eq 'InterNetwork'
+
+    if ($isIPv4) {
         route delete $Target *>$null
         Write-Host "Removed: $Target" -ForegroundColor Yellow
+    } 
+    else {
+        try {
+            $ips = [System.Net.Dns]::GetHostAddresses($Target) | Where-Object { $_.AddressFamily -eq 'InterNetwork' }
+            
+            if ($ips) {
+                foreach ($ip in $ips) {
+                    $ipStr = $ip.IPAddressToString
+                    route delete $ipStr *>$null
+                    Write-Host "Removed: $ipStr  ← $Target" -ForegroundColor Yellow
+                }
+            } else {
+                Write-Host "Domain resolved, but no IPv4 addresses found for: $Target" -ForegroundColor Yellow
+            }
+        } catch {
+            Write-Host "Could not resolve domain: $Target" -ForegroundColor Red
+        }
     }
 }
 
