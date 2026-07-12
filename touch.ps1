@@ -4,12 +4,6 @@ function touch {
         [string[]]$Path,
         [datetime]$ReferenceTime = (Get-Date)
     )
-    try {
-        $ReferenceTime = [datetime]::Parse($ReferenceTime)
-    } catch {
-        Write-Error "Invalid reference time format. Please provide a valid datetime."
-        return
-    }
     
     try {
         foreach ($p in $Path) {
