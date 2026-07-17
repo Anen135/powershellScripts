@@ -1,3 +1,4 @@
+#Requires -Version 7.0
 <#
 .SYNOPSIS
     Moves a folder to a new location and replaces the original path with a
@@ -111,6 +112,36 @@ function Format-Bytes {
     return "{0:N2} {1}" -f $Bytes, $units[$i]
 }
 
+function Get-LockedFiles {
+    param([string]$Path)
+    
+    $locked = [System.Collections.Generic.List[string]]::new()
+    $files = Get-ChildItem -LiteralPath $Path -Recurse -File -Force -ErrorAction SilentlyContinue
+
+    foreach ($file in $files) {
+        try {
+            # Attempt to open the file with exclusive access (no sharing allowed)
+            $stream = [System.IO.File]::Open(
+                $file.FullName, 
+                [System.IO.FileMode]::Open, 
+                [System.IO.FileAccess]::ReadWrite, 
+                [System.IO.FileShare]::None
+            )
+            $stream.Close()
+            $stream.Dispose()
+        }
+        catch [System.IO.IOException] {
+            # The file is locked by another process
+            $locked.Add($file.FullName)
+        }
+        catch [System.UnauthorizedAccessException] {
+            # If we lack permissions to open it, we can't guarantee it's free. Treat as locked.
+            $locked.Add($file.FullName)
+        }
+    }
+    return $locked
+}
+
 # -------------------------------------------------------------------------
 # STEP 1: Security / pre-flight checks
 # -------------------------------------------------------------------------
@@ -204,6 +235,33 @@ if ($checksPassed) {
         $checksPassed = $false
     } else {
         Write-Ok "Sufficient free space available."
+    }
+}
+
+# 1g. Check for locked files
+if ($checksPassed) {
+    Write-Step "Checking for locked files in source folder"
+    Write-Host "    Scanning files (this may take a moment for large folders)..." -ForegroundColor DarkGray
+    
+    $lockedFiles = Get-LockedFiles -Path $SourcePath
+
+    if ($lockedFiles.Count -gt 0) {
+        Write-Fail "Found $($lockedFiles.Count) file(s) currently locked by other processes."
+        Write-Host "    Locked files:" -ForegroundColor Yellow
+        
+        # Show first 10 to avoid flooding the console
+        $displayCount = [Math]::Min($lockedFiles.Count, 10)
+        for ($i = 0; $i -lt $displayCount; $i++) {
+            Write-Host "      - $($lockedFiles[$i])" -ForegroundColor Yellow
+        }
+        if ($lockedFiles.Count -gt 10) {
+            Write-Host "      ... and $($lockedFiles.Count - 10) more." -ForegroundColor Yellow
+        }
+        
+        Write-Host "    -> Please close the applications using these files and try again." -ForegroundColor Yellow
+        $checksPassed = $false
+    } else {
+        Write-Ok "No locked files detected in source folder."
     }
 }
 
