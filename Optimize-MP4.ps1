@@ -6,16 +6,16 @@ function Optimize-MP4 {
     $InputDir = Get-Location
     $OutputPath = Join-Path $InputDir $OutputDir
 
-    # Создать папку назначения
+    # Create destination folder
     if (!(Test-Path $OutputPath)) {
         New-Item -ItemType Directory -Path $OutputPath | Out-Null
     }
 
-    # Найти MP4
+    # Find MP4 files
     $files = Get-ChildItem -Path $InputDir -Filter "*.mp4" -File
 
     if ($files.Count -eq 0) {
-        Write-Host "MP4 файлов не найдено." -ForegroundColor Yellow
+        Write-Host "No MP4 files found." -ForegroundColor Yellow
         return
     }
 
@@ -24,10 +24,10 @@ function Optimize-MP4 {
         $destination = Join-Path $OutputPath $file.Name
 
         Write-Host ""
-        Write-Host "Обработка: $($file.Name)" -ForegroundColor Cyan
+        Write-Host "Processing: $($file.Name)" -ForegroundColor Cyan
 
         if (Test-Path $destination) {
-            Write-Host "Пропуск (уже существует): $destination" -ForegroundColor Yellow
+            Write-Host "Skipping (already exists): $destination" -ForegroundColor Yellow
             continue
         }
 
@@ -42,13 +42,13 @@ function Optimize-MP4 {
             $destination
 
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "Готово: $destination" -ForegroundColor Green
+            Write-Host "Done: $destination" -ForegroundColor Green
         }
         else {
-            Write-Host "Ошибка: $($file.Name)" -ForegroundColor Red
+            Write-Host "Error: $($file.Name)" -ForegroundColor Red
         }
     }
 
     Write-Host ""
-    Write-Host "Очистка завершена." -ForegroundColor Green
+    Write-Host "Cleanup completed." -ForegroundColor Green
 }

@@ -6,7 +6,7 @@ param(
 )
 
 if (-not (Test-Path $PathsFile)) {
-    Write-Error "Файл со списком путей не найден: $PathsFile"
+    Write-Error "Path list file not found: $PathsFile"
     exit 1
 }
 
@@ -14,12 +14,12 @@ $PathsFileDir = Split-Path -Parent $PathsFile
 $paths = Get-Content $PathsFile | ForEach-Object { $_.Trim().Trim('"') } | Where-Object { $_ -ne "" -and -not $_.StartsWith("#") }
 
 if ($paths.Count -eq 0) {
-    Write-Warning "Нет валидных путей для очистки."
+    Write-Warning "No valid paths to clean."
     exit 0
 }
 
-Write-Host "Найдено $($paths.Count) пут(ей) для очистки." -ForegroundColor Cyan
-if ($WhatIf) { Write-Host "Режим WhatIf: ничего не будет удалено, только предпросмотр." -ForegroundColor Yellow }
+Write-Host "Found $($paths.Count) path(s) to clean." -ForegroundColor Cyan
+if ($WhatIf) { Write-Host "WhatIf mode: nothing will be deleted, preview only." -ForegroundColor Yellow }
 $totalFilesDeleted = 0
 $totalFoldersDeleted = 0
 $totalErrors = 0
@@ -30,7 +30,7 @@ foreach ($rawPath in $paths) {
     if (-not ([System.IO.Path]::IsPathRooted($path))) { $path = Join-Path $PathsFileDir $path }
     $item = Get-Item $path -ErrorAction SilentlyContinue
     if (-not $item) {
-        Write-Warning "Путь не существует: $path"
+        Write-Warning "Path does not exist: $path"
         $totalErrors++
         $failedItems += $path
         continue
@@ -44,43 +44,43 @@ foreach ($rawPath in $paths) {
                     try {
                         Remove-Item $child.FullName -Recurse -Force -ErrorAction Stop -WhatIf:$WhatIf
                         if ($child.PSIsContainer) { $totalFoldersDeleted++ } else { $totalFilesDeleted++ }
-                        Write-Host "Удалено: $($child.FullName)" -ForegroundColor Green
+                        Write-Host "Deleted: $($child.FullName)" -ForegroundColor Green
                     } catch {
-                        Write-Warning "Не удалось удалить $($child.FullName): $_"
+                        Write-Warning "Failed to delete $($child.FullName): $_"
                         $totalErrors++
                         $failedItems += $child.FullName
                     }
                 }
             } else {
-                Write-Host "Папка уже пуста: $path" -ForegroundColor Gray
+                Write-Host "Folder is already empty: $path" -ForegroundColor Gray
             }
         } else {
             try {
                 Remove-Item $path -Force -ErrorAction Stop -WhatIf:$WhatIf
                 $totalFilesDeleted++
-                Write-Host "Файл удален: $path" -ForegroundColor Green
+                Write-Host "File deleted: $path" -ForegroundColor Green
             } catch {
-                Write-Warning "Не удалось удалить файл ${path}: $_"
+                Write-Warning "Failed to delete file ${path}: $_"
                 $totalErrors++
                 $failedItems += $path
             }
         }
     } catch {
-        Write-Warning "Не удалось обработать путь ${path}: $_"
+        Write-Warning "Failed to process path ${path}: $_"
         $totalErrors++
         $failedItems += $path
     }
 }
-Write-Host "`nОчистка завершена!" -ForegroundColor Cyan
-Write-Host "Файлов удалено: $totalFilesDeleted" -ForegroundColor Yellow
-Write-Host "Папок удалено: $totalFoldersDeleted" -ForegroundColor Yellow
-Write-Host "Ошибок: $totalErrors" -ForegroundColor Red
+Write-Host "`nCleanup completed!" -ForegroundColor Cyan
+Write-Host "Files deleted: $totalFilesDeleted" -ForegroundColor Yellow
+Write-Host "Folders deleted: $totalFoldersDeleted" -ForegroundColor Yellow
+Write-Host "Errors: $totalErrors" -ForegroundColor Red
 
 if ($failedItems.Count -gt 0) {
-    Write-Host "`nНе удалось обработать следующие пути:" -ForegroundColor Red
+    Write-Host "`nFailed to process the following paths:" -ForegroundColor Red
     $failedItems | ForEach-Object { Write-Host " - $_" -ForegroundColor Red }
 }
 
 if ($WhatIf) {
-    Write-Host "`nЗапустите скрипт без параметра -WhatIf для реального удаления." -ForegroundColor Yellow
+    Write-Host "`nRun the script without -WhatIf parameter for actual deletion." -ForegroundColor Yellow
 }

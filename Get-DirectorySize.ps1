@@ -1,80 +1,80 @@
 ﻿<#
 .SYNOPSIS
-    Расширенный аналог команды DIR для PowerShell.
+    Enhanced alternative to the DIR command for PowerShell.
 
 .DESCRIPTION
-    Скрипт выводит список файлов и папок в указанном каталоге с поддержкой большинства
-    ключей из оригинальной команды DIR (Windows). Поддерживаются фильтры по атрибутам,
-    сортировка, рекурсивный поиск, вывод владельцев, нижний регистр, форматирование
-    вывода и вычисление размеров.
+    The script displays a list of files and folders in the specified directory with support for most
+    keys from the original DIR command (Windows). Supports attribute filters,
+    sorting, recursive search, owner display, lower case, output formatting,
+    and size calculation.
 
 .PARAMETER Path
-    Каталог, содержимое которого требуется отобразить.
+    Directory whose contents to display.
 
 .PARAMETER Unit
-    Единица измерения размера (MB или GB). По умолчанию: MB.
+    Size unit (MB or GB). Default: MB.
 
 .PARAMETER Recurse
-    Эквивалент ключа /S. Рекурсивный обход всех подкаталогов.
+    Equivalent of /S switch. Recursive traversal of all subdirectories.
 
 .PARAMETER BareFormat
-    Эквивалент ключа /B. Вывод только имен файлов и папок без дополнительных данных.
+    Equivalent of /B switch. Output only file and folder names without additional data.
 
 .PARAMETER LowerCase
-    Эквивалент ключа /L. Вывод имен файлов и папок в нижнем регистре.
+    Equivalent of /L switch. Output file and folder names in lower case.
 
 .PARAMETER Pause
-    Эквивалент ключа /P. Пауза после каждой строки с ожиданием нажатия клавиши.
+    Equivalent of /P switch. Pause after each line waiting for key press.
 
 .PARAMETER Sort
-    Эквивалент ключа /O. Сортировка списка:
-      - N: по имени (по алфавиту)
-      - S: по размеру (от меньшего)
-      - E: по расширению (по алфавиту)
-      - D: по дате (от старого)
-      - G: сначала каталоги
+    Equivalent of /O switch. Sort order:
+      - N: by name (alphabetically)
+      - S: by size (smallest first)
+      - E: by extension (alphabetically)
+      - D: by date (oldest first)
+      - G: folders first
 
 .PARAMETER Owner
-    Эквивалент ключа /Q. Вывод владельца каждого файла или каталога.
+    Equivalent of /Q switch. Display owner of each file or directory.
 
 .PARAMETER TimeField
-    Эквивалент ключа /T. Поле времени для сортировки:
-      - C: дата создания
-      - A: дата последнего доступа
-      - W: дата последнего изменения (по умолчанию)
+    Equivalent of /T switch. Time field for sorting:
+      - C: creation date
+      - A: last access date
+      - W: last write date (default)
 
 .PARAMETER FourDigitYear
-    Эквивалент ключа /4. Использовать 4‑значный формат года в выводе.
+    Equivalent of /4 switch. Use 4-digit year format in output.
 
 .PARAMETER Attributes
-    Эквивалент ключа /A. Фильтрация по атрибутам файлов:
-      - D: каталоги
-      - R: только для чтения
-      - H: скрытые
-      - A: архивные
-      - S: системные
+    Equivalent of /A switch. Filter by file attributes:
+      - D: directories
+      - R: read-only
+      - H: hidden
+      - A: archive
+      - S: system
 
 .EXAMPLE
     PS> .\Get-DirSize.ps1 -Path "C:\Temp"
-    Выводит список файлов и папок в каталоге `C:\Temp` с размерами в мегабайтах.
+    Displays list of files and folders in `C:\Temp` with sizes in megabytes.
 
 .EXAMPLE
     PS> .\Get-DirSize.ps1 -Path "C:\Windows" -Unit GB -Recurse
-    Выводит все файлы и папки в `C:\Windows` и подкаталогах, размеры в гигабайтах.
+    Displays all files and folders in `C:\Windows` and subdirectories, sizes in gigabytes.
 
 .EXAMPLE
     PS> .\Get-DirSize.ps1 -Path "C:\Data" -BareFormat -LowerCase
-    Выводит список файлов и папок в `C:\Data` только именами в нижнем регистре.
+    Displays list of files and folders in `C:\Data` with only names in lower case.
 
 .EXAMPLE
     PS> .\Get-DirSize.ps1 -Path "C:\Projects" -Owner -Sort D
-    Отображает список файлов и папок в каталоге `C:\Projects` с указанием владельца
-    и сортировкой по дате создания.
+    Displays list of files and folders in `C:\Projects` with owner information
+    and sorting by creation date.
 
 .NOTES
-    Версия: 3.0
-    Автор: Anen
-    Лицензия: MIT
+    Version: 3.0
+    Author: Anen
+    License: MIT
 #>
 
 [CmdletBinding()]
@@ -101,7 +101,7 @@ param (
 )
 
 begin {
-    Write-Verbose "Инициализация параметров..."
+    Write-Verbose "Initializing parameters..."
     $divider = if ($Unit -eq "GB") { 1GB } else { 1MB }
     $items = Get-ChildItem -Path $Path -Force -ErrorAction Stop
 
@@ -153,10 +153,10 @@ process {
                 Write-Output $obj
             }
 
-            if ($Pause) { Read-Host "Нажмите Enter для продолжения..." }
+            if ($Pause) { Read-Host "Press Enter to continue..." }
         }
         catch {
-            Write-Warning "Ошибка при обработке '$($item.FullName)': $($_.Exception.Message)"
+            Write-Warning "Error processing '$($item.FullName)': $($_.Exception.Message)"
         }
     }
 }

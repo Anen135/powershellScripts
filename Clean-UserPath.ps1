@@ -1,15 +1,15 @@
 ﻿<#
 .SYNOPSIS
-    Очищает пользовательскую переменную среды PATH от несуществующих путей.
+    Cleans the user PATH environment variable from non-existent paths.
 
 .DESCRIPTION
-    Делает резервную копию PATH, удаляет только несуществующие директории,
-    обновляет значение в реестре и сообщает список удалённых путей.
-    Если изменений нет — завершает работу без обновления PATH.
+    Creates a backup of PATH, removes only non-existent directories,
+    updates the value in the registry, and reports the list of removed paths.
+    If no changes are made — exits without updating PATH.
 
 .NOTES
-    Версия: 2.0
-    Автор: Системный администратор
+    Version: 2.0
+    Author: System Administrator
 #>
 
 [CmdletBinding()]
@@ -20,19 +20,19 @@ begin {
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
     $backupPath = Join-Path $env:USERPROFILE "Desktop\user-path-backup-$timestamp.txt"
 
-    Write-Verbose "Регистровый путь: $regPath"
-    Write-Verbose "Путь для резервной копии: $backupPath"
+    Write-Verbose "Registry path: $regPath"
+    Write-Verbose "Backup path: $backupPath"
 }
 
 process {
     try {
         if (-not (Test-Path $regPath)) {
-            throw "Раздел реестра $regPath не существует."
+            throw "Registry key $regPath does not exist."
         }
 
         $oldPath = (Get-ItemProperty -Path $regPath -Name Path -ErrorAction Stop).Path
         if ([string]::IsNullOrWhiteSpace($oldPath)) {
-            Write-Warning "Переменная PATH отсутствует или пуста."
+            Write-Warning "PATH variable is missing or empty."
             return
         }
 
@@ -53,14 +53,14 @@ process {
         }
 
         if ($invalidPaths.Count -eq 0) {
-            Write-Output "Все пути в PATH существуют. Изменений не требуется."
+            Write-Output "All paths in PATH exist. No changes required."
             return
         }
 
-        # Сначала вычисляем новый PATH
+        # First compute the new PATH
         $newPath = $validPaths -join ';'
 
-        # Потом создаём объект для бэкапа (теперь $newPath существует)
+        # Then create backup object (now $newPath exists)
         $backupObject = [PSCustomObject]@{
             Timestamp     = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
             OriginalPath  = $oldPath
@@ -71,23 +71,23 @@ process {
             RemovedCount  = $invalidPaths.Count
         }
 
-        # Сохраняем JSON-бэкап
+        # Save JSON backup
         $backupPath = Join-Path $env:USERPROFILE "Desktop\user-path-backup-$timestamp.json"
         $backupObject | ConvertTo-Json -Depth 10 | Out-File -FilePath $backupPath -Encoding UTF8 -Force
 
-        Write-Output "Резервная копия сохранена в JSON: $backupPath"
-        Write-Output "Удалено несуществующих путей: $($invalidPaths.Count)"
+        Write-Output "Backup saved to JSON: $backupPath"
+        Write-Output "Removed non-existent paths: $($invalidPaths.Count)"
 
-        # Обновляем реестр
+        # Update registry
         Set-ItemProperty -Path $regPath -Name Path -Value $newPath -ErrorAction Stop
-        Write-Output "Переменная PATH успешно обновлена."
+        Write-Output "PATH variable successfully updated."
     }
     catch {
-        Write-Error "Ошибка при обновлении PATH: $($_.Exception.Message)"
+        Write-Error "Error updating PATH: $($_.Exception.Message)"
         exit 1
     }
 }
 
 end {
-    Write-Verbose "Завершение работы скрипта."
+    Write-Verbose "Script execution completed."
 }

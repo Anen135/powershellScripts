@@ -1,17 +1,17 @@
 ﻿<#
 .SYNOPSIS
-    Удаляет указанное приложение из автозагрузки Windows.
+    Removes the specified application from Windows startup.
 
 .DESCRIPTION
-    Скрипт удаляет запись из раздела реестра HKCU:\Software\Microsoft\Windows\CurrentVersion\Run,
-    что предотвращает автоматический запуск приложения при входе пользователя.
+    The script removes an entry from the registry key HKCU:\Software\Microsoft\Windows\CurrentVersion\Run,
+    preventing the application from automatically starting when the user logs in.
 
 .PARAMETER AppName
-    Имя записи в автозагрузке (ключ в реестре), которую необходимо удалить.
+    The name of the startup entry (registry key) to be removed.
 
 .NOTES
-    Версия: 2.0
-    Автор: Системный администратор
+    Version: 2.0
+    Author: System Administrator
 #>
 
 [CmdletBinding()]
@@ -22,39 +22,39 @@ param(
 )
 
 begin {
-    Write-Verbose "Инициализация параметров..."
+    Write-Verbose "Initializing parameters..."
     $RegPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 }
 
 process {
     try {
-        Write-Verbose "Проверка наличия записи '$AppName' в $RegPath..."
+        Write-Verbose "Checking for entry '$AppName' in $RegPath..."
         $Exists = Get-ItemProperty -Path $RegPath -ErrorAction SilentlyContinue | Select-Object -Property $AppName
 
         if ($null -ne $Exists.$AppName) {
-            Write-Verbose "Запись найдена. Удаление..."
+            Write-Verbose "Entry found. Removing..."
             Remove-ItemProperty -Path $RegPath -Name $AppName -ErrorAction Stop
 
-            Write-Output "Запись '$AppName' удалена из автозагрузки."
+            Write-Output "Entry '$AppName' removed from startup."
 
-            Write-Verbose "Проверка результата..."
+            Write-Verbose "Verifying result..."
             $Check = Get-ItemProperty -Path $RegPath -ErrorAction SilentlyContinue | Select-Object -Property $AppName
             if ($null -eq $Check.$AppName) {
-                Write-Output "Подтверждено: запись '$AppName' отсутствует в автозагрузке."
+                Write-Output "Confirmed: entry '$AppName' is absent from startup."
             }
             else {
-                Write-Warning "Запись '$AppName' все ещё существует после попытки удаления."
+                Write-Warning "Entry '$AppName' still exists after removal attempt."
             }
         }
         else {
-            Write-Output "Запись '$AppName' не найдена в автозагрузке."
+            Write-Output "Entry '$AppName' not found in startup."
         }
     }
     catch {
-        Write-Error "Ошибка при удалении записи: $($_.Exception.Message)"
+        Write-Error "Error removing entry: $($_.Exception.Message)"
     }
 }
 
 end {
-    Write-Verbose "Завершение работы скрипта."
+    Write-Verbose "Script execution completed."
 }

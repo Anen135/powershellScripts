@@ -1,11 +1,11 @@
-# --- БАЗОВЫЕ системные временные папки (включая альтернативы) ---
+# --- BASIC system temporary folders (including alternatives) ---
 %TEMP%
 %TMP%
 %SystemRoot%\Temp
 %USERPROFILE%\AppData\Local\Temp
 %LOCALAPPDATA%\Temp
 
-# --- БРАУЗЕРЫ (Cache, Code Cache, GPUCache, Service Worker) ---
+# --- BROWSERS (Cache, Code Cache, GPUCache, Service Worker) ---
 %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Code Cache
 %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache\Cache_Data
 %LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache
@@ -21,7 +21,7 @@
 %LOCALAPPDATA%\Vivaldi\User Data\Default\Cache
 %LOCALAPPDATA%\Chromium\User Data\Default\Cache
 
-# Firefox: замените <profile> на имя профиля (или добавьте несколько строк для каждого профиля)
+# Firefox: replace <profile> with the profile name (or add multiple lines for each profile)
 # %APPDATA%\Mozilla\Firefox\Profiles\<profile>\cache2
 # %LOCALAPPDATA%\Mozilla\Firefox\Profiles\<profile>\cache2
 
@@ -31,16 +31,16 @@
 %LOCALAPPDATA%\Opera Software\Opera GX Stable\Default\Cache
 %APPDATA%\Opera Software\Opera GX Stable\Default\Code Cache
 
-# --- РАЗРАБОТЧИКИ / IDE / РЕДАКТОРЫ ---
-# JetBrains (PyCharm, IntelliJ и т.д.)
-# Можно будет использовать когда добавлю маски
+# --- DEVELOPERS / IDE / EDITORS ---
+# JetBrains (PyCharm, IntelliJ, etc.)
+# Can be used when I add masks
 #%LOCALAPPDATA%\JetBrains\PyCharm<version>\caches
 #%LOCALAPPDATA%\JetBrains\Toolbox\apps\* \caches
 # Visual Studio Code
 %APPDATA%\Code\Cache
 %USERPROFILE%\.vscode\cached-data
 
-# --- Менеджеры пакетов и кэши сборок ---
+# --- Package managers and build caches ---
 %LOCALAPPDATA%\npm-cache
 %APPDATA%\npm-cache
 %USERPROFILE%\.npm
@@ -48,9 +48,9 @@
 %LOCALAPPDATA%\Yarn\Cache
 %USERPROFILE%\.yarn\cache
 %USERPROFILE%\.pnpm-store
-# pnpm / yarn / pip — при необходимости добавьте альтернативные пути
+# pnpm / yarn / pip — add alternative paths if needed
 
-# --- Мессенджеры и клиенты ---
+# --- Messengers and clients ---
 %LOCALAPPDATA%\Discord\Cache
 %APPDATA%\discord\Cache
 %LOCALAPPDATA%\slack\Cache
@@ -58,25 +58,25 @@
 %LOCALAPPDATA%\Microsoft\Teams\Cache
 %LOCALAPPDATA%\Microsoft\Teams\IndexedDB
 
-# --- Игровые и мультимедиа клиенты ---
+# --- Gaming and multimedia clients ---
 %ProgramFiles(x86)%\Steam\appcache
 %LOCALAPPDATA%\Spotify\Storage
 
-# --- Системные кэши и миниатюры (Проверьте перед удалением!) ---
+# --- System caches and thumbnails (Check before deleting!) ---
 %LOCALAPPDATA%\Microsoft\Windows\Explorer
 %LOCALAPPDATA%\Microsoft\Windows\INetCache
 %LOCALAPPDATA%\Microsoft\Windows\Temporary Internet Files
 
-# --- Дополнительные (включите по необходимости) ---
-# Windows Update download — Требует прав администратора
+# --- Additional (enable as needed) ---
+# Windows Update download — Requires administrator rights
 #%WINDIR%\SoftwareDistribution\Download
 
-# Prefetch — Не обязательно чистить часто
+# Prefetch — Not necessary to clean often
 #%SystemRoot%\Prefetch
 
-# ПРИМЕЧАНИЯ:
-# - Строки, начинающиеся с #, игнорируются скриптом (комментарии).
-# - Замените <profile> и <version> на реальные значения, если хотите — иначе оставьте строку закомментированной или добавьте конкретные пути.
-# - Некоторые пути требуют прав администратора; запускайте скрипт с WhatIf сначала для предпросмотра.
-# - Если хотите исключить какие-то приложения, закомментируйте соответствующие строки (добавьте # в начале).
-# - Маски временно не поддерживаются
+# NOTES:
+# - Lines starting with # are ignored by the script (comments).
+# - Replace <profile> and <version> with actual values if you want — otherwise leave the line commented or add specific paths.
+# - Some paths require administrator rights; run the script with WhatIf first for preview.
+# - If you want to exclude certain applications, comment out the corresponding lines (add # at the beginning).
+# - Masks are temporarily not supported

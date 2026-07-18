@@ -9,11 +9,11 @@ function Convert-ZipToRar {
     )
 
     if (-not (Test-Path $ZipFile)) {
-        throw "Файл не найден: $ZipFile"
+        throw "File not found: $ZipFile"
     }
 
     if (-not (Test-Path $WinRAR)) {
-        throw "WinRAR не найден: $WinRAR"
+        throw "WinRAR not found: $WinRAR"
     }
 
     if (-not $OutputFile) {
@@ -25,10 +25,10 @@ function Convert-ZipToRar {
     try {
         New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
 
-        Write-Host "Распаковка ZIP..."
+        Write-Host "Extracting ZIP..."
         Expand-Archive -Path $ZipFile -DestinationPath $tempDir -Force
 
-        Write-Host "Создание RAR..."
+        Write-Host "Creating RAR..."
         & $WinRAR a `
             -r `
             -ma5 `
@@ -38,7 +38,7 @@ function Convert-ZipToRar {
             "$tempDir\*"
 
         if ($LASTEXITCODE -ne 0) {
-            throw "WinRAR завершился с кодом $LASTEXITCODE"
+            throw "WinRAR exited with code $LASTEXITCODE"
         }
 
         $zipSize = (Get-Item $ZipFile).Length

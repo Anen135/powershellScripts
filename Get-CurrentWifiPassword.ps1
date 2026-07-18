@@ -1,51 +1,51 @@
 ﻿<#
 .SYNOPSIS
-    Получает SSID и пароль текущей Wi-Fi сети.
+    Gets the SSID and password of the current Wi-Fi network.
 
 .DESCRIPTION
-    Использует netsh для определения активного Wi-Fi подключения,
-    затем выводит имя сети (SSID) и её пароль, если он доступен.
+    Uses netsh to determine the active Wi-Fi connection,
+    then outputs the network name (SSID) and its password if available.
 
 .NOTES
-    Версия: 2.3 Encoding fix
-    Автор: Anen
+    Version: 2.3 Encoding fix
+    Author: Anen
 #>
 
 [CmdletBinding()]
 param()
 
 begin {
-    # КРИТИЧЕСКИ ВАЖНО: Установка кодовой страницы 866 для корректного чтения вывода netsh в русской локали
+    # CRITICALLY IMPORTANT: Set code page 866 for correct reading of netsh output
     [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding(866)
     $OutputEncoding = [System.Text.Encoding]::GetEncoding(866)
 
-    # Проверка прав администратора
+    # Check for administrator privileges
     $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal   = New-Object Security.Principal.WindowsPrincipal($currentUser)
     $isAdmin     = $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
     if (-not $isAdmin) {
-        Write-Warning "Некоторые данные (пароль Wi-Fi) могут быть недоступны без прав администратора."
+        Write-Warning "Some data (Wi-Fi password) may not be available without administrator rights."
     }
 }
 
 process {
     try {
-        # Получение SSID текущего подключения
+        # Get current connection SSID
         $wifiName = (netsh wlan show interfaces) -match '^\s*SSID\s*:\s*(.+)$' |
                     ForEach-Object { ($_ -split ':', 2)[1].Trim() }
 
         if (-not $wifiName) {
-            Write-Warning "Активное Wi-Fi подключение не найдено."
+            Write-Warning "Active Wi-Fi connection not found."
             return
         }
 
-        Write-Output "Текущая Wi-Fi сеть: $wifiName"
+        Write-Output "Current Wi-Fi network: $wifiName"
 
-        # Получение профиля с паролем (вывод приходит в CP866)
+        # Get profile with password (output comes in CP866)
         $profileInfo = netsh wlan show profile name="$wifiName" key=clear
 
-        # Поиск пароля: обрабатываем каждую строку отдельно
+        # Search for password: process each line separately
         $password = $null
         foreach ($line in $profileInfo) {
             if ($line -match '(?:Содержимое ключа|Key Content)\s*:\s*(.+)') {
@@ -55,17 +55,17 @@ process {
         }
 
         if ($password) {
-            Write-Output "Пароль: $password"
+            Write-Output "Password: $password"
         }
         else {
-            Write-Output "Пароль не найден или сеть не защищена."
+            Write-Output "Password not found or network is not secured."
         }
     }
     catch {
-        Write-Error "Ошибка при получении информации о Wi-Fi: $($_.Exception.Message)"
+        Write-Error "Error getting Wi-Fi information: $($_.Exception.Message)"
     }
 }
 
 end {
-    Write-Verbose "Скрипт завершён."
+    Write-Verbose "Script completed."
 }

@@ -1,24 +1,24 @@
 ﻿<#
 .SYNOPSIS
-    Инициализирует git репозиторий, создает репозиторий на GitHub и пушит изменения.
+    Initializes a git repository, creates a repository on GitHub, and pushes changes.
 
 .DESCRIPTION
-    Скрипт инициализирует git в текущем каталоге (если еще не инициализирован),
-    создает репозиторий на GitHub с указанным именем и приватностью,
-    добавляет все файлы, делает коммит и пушит изменения.
+    The script initializes git in the current directory (if not already initialized),
+    creates a repository on GitHub with the specified name and visibility,
+    adds all files, commits, and pushes changes.
 
 .PARAMETER RepoName
-    Имя создаваемого репозитория.
+    Name of the repository to create.
 
 .PARAMETER Private
-    Создаёт приватный репозиторий.
+    Creates a private repository.
 
 .PARAMETER Public
-    Создаёт публичный репозиторий (по умолчанию).
+    Creates a public repository (default).
 
 .NOTES
-    Версия: 2.0
-    Автор: Anen
+    Version: 2.0
+    Author: Anen
 #>
 
 [CmdletBinding()]
@@ -32,70 +32,70 @@ param (
 )
 
 begin {
-    Write-Verbose "Проверка доступности утилит git и gh..."
+    Write-Verbose "Checking availability of git and gh utilities..."
 
     function Test-Command($cmd) {
         return $null -ne (Get-Command $cmd -ErrorAction SilentlyContinue)
     }
 
     if (-not (Test-Command "git")) {
-        Write-Error "Git не установлен или недоступен в PATH."
+        Write-Error "Git is not installed or not available in PATH."
         exit 1
     }
 
     if (-not (Test-Command "gh")) {
-        Write-Error "GitHub CLI (gh) не установлен или недоступен в PATH."
+        Write-Error "GitHub CLI (gh) is not installed or not available in PATH."
         exit 1
     }
 
-    # Определение флага приватности
+    # Determine visibility flag
     $visibility = "--public"
     if ($Private.IsPresent) { $visibility = "--private" }
 
-    Write-Verbose "Флаг приватности: $visibility"
+    Write-Verbose "Visibility flag: $visibility"
 }
 
 process {
     try {
-        # 1. Инициализация git
+        # 1. Initialize git
         if (-not (Test-Path ".git")) {
             git init 
-            Write-Output "Git инициализирован."
+            Write-Output "Git initialized."
         }
         else {
-            Write-Output "Git уже инициализирован."
+            Write-Output "Git already initialized."
         }
 
-        # 2. Добавление и коммит
+        # 2. Add and commit
         git add . 
 
-        # Проверим, есть ли что коммитить
+        # Check if there is anything to commit
         $status = git status --porcelain
         if ($status) {
             git commit -m "Initial commit" 
-            Write-Output "Изменения закоммичены."
+            Write-Output "Changes committed."
         }
         else {
-            Write-Output "Нет изменений для коммита."
+            Write-Output "No changes to commit."
         }
 
-        # 3. Создание репозитория на GitHub
+        # 3. Create repository on GitHub
         try {
             gh repo create $RepoName $visibility --source=. --remote=origin --push --confirm
-            Write-Output "Репозиторий '$RepoName' создан и изменения запушены."
+            Write-Output "Repository '$RepoName' created and changes pushed."
         }
         catch {
-            Write-Warning "Не удалось создать репозиторий через gh: $($_.Exception.Message)"
-            Write-Warning "Возможно, репозиторий '$RepoName' уже существует. Попробую только пуш..."
+            Write-Warning "Failed to create repository via gh: $($_.Exception.Message)"
+            Write-Warning "Repository '$RepoName' may already exist. Trying to push only..."
             git push -u origin main 2>$null
         }
     }
     catch {
-        Write-Error "Ошибка выполнения: $($_.Exception.Message)"
+        Write-Error "Execution error: $($_.Exception.Message)"
         exit 1
     }
 }
 
 end {
-    Write-Verbose "Завершение работы скрипта."
+    Write-Verbose "Script execution completed."
 }

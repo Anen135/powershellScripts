@@ -29,7 +29,7 @@ if ($Current) {
  }
 
 $paths = ($env:Path -split ';') | Where-Object { $_ -and $_.Trim() }
-$paths += ""  # пустая строка для добавления новой
+$paths += ""  # empty string for adding a new one
 $selectedIndex = 0
 $message = $null
 
@@ -41,9 +41,9 @@ function Get-UILayout {
         HeaderLine     = 0
         SeparatorLine  = 1
         ListStart      = 2
-        ListLines      = [Math]::Max(5, $height - 8)  # заголовок, разделитель, 2 строки ввода, сообщение, подсказка
+        ListLines      = [Math]::Max(5, $height - 8)  # header, separator, 2 input lines, message, hint
         EditLabelLine  = $height - 6                 # "Editing: ..."
-        EditInputLine  = $height - 5                 # строка ввода
+        EditInputLine  = $height - 5                 # input line
         MessageLine    = $height - 3
         HintLine       = $height - 2
         WindowWidth    = $width
@@ -94,22 +94,22 @@ function Show-UI {
 
     $layout = Get-UILayout
 
-    # Заголовок
+    # Header
     [Console]::SetCursorPosition(0, $layout.HeaderLine)
     $header = "Edit PATH entries (total: $($paths.Length - 1) real paths)"
     Write-Host $header.PadRight($layout.WindowWidth - 1) -ForegroundColor Cyan
 
-    # Разделитель
+    # Separator
     Clear-Line $layout.SeparatorLine
 
-    # Список путей
+    # Path list
     Show-PathList -paths $paths -selectedIndex $selectedIndex -layout $layout
 
-    # Очистка строк редактирования (на всякий случай)
+    # Clear editing lines (just in case)
     Clear-Line $layout.EditLabelLine
     Clear-Line $layout.EditInputLine
 
-    # Сообщение
+    # Message
     Clear-Line $layout.MessageLine
     if ($message) {
         [Console]::SetCursorPosition(0, $layout.MessageLine)
@@ -123,7 +123,7 @@ function Show-UI {
         Write-Host $message -ForegroundColor $color -NoNewline
     }
 
-    # Подсказка
+    # Hint
     [Console]::SetCursorPosition(0, $layout.HintLine)
     $hint = "Arrows: navigate | Enter: edit | Del: delete | S: save | Esc: exit"
     Write-Host $hint -ForegroundColor Yellow -NoNewline
@@ -132,7 +132,7 @@ function Show-UI {
     [Console]::CursorVisible = $false
 }
 
-# === Основной цикл ===
+# === Main loop ===
 [Console]::Clear()
 $running = $true
 
@@ -155,7 +155,7 @@ while ($running) {
             $currentValue = $paths[$selectedIndex]
             $layout = Get-UILayout
 
-            # Показываем строки редактирования
+            # Show editing lines
             Clear-Line $layout.EditLabelLine
             [Console]::SetCursorPosition(0, $layout.EditLabelLine)
             Write-Host "Editing: [$selectedIndex] $currentValue" -ForegroundColor Cyan
@@ -168,7 +168,7 @@ while ($running) {
             $newValue = Read-Host
             [Console]::CursorVisible = $false
 
-            # Сразу стираем строки редактирования
+            # Immediately clear editing lines
             Clear-Line $layout.EditLabelLine
             Clear-Line $layout.EditInputLine
 

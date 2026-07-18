@@ -1,20 +1,20 @@
 ﻿<#
 .SYNOPSIS
-    Добавляет указанное приложение в автозагрузку Windows.
+    Adds the specified application to Windows startup.
 
 .DESCRIPTION
-    Скрипт регистрирует путь к приложению в разделе реестра HKCU:\Software\Microsoft\Windows\CurrentVersion\Run
-    для автоматического запуска при входе пользователя в систему.
+    The script registers the application path in the registry key HKCU:\Software\Microsoft\Windows\CurrentVersion\Run
+    for automatic launch when the user logs in.
 
 .PARAMETER AppName
-    Имя записи в автозагрузке (ключ в реестре).
+    The name of the startup entry (registry key).
 
 .PARAMETER AppPath
-    Полный путь к исполняемому файлу приложения.
+    Full path to the application executable file.
 
 .NOTES
-    Версия: 2.0
-    Автор: Anen
+    Version: 2.0
+    Author: Anen
 #>
 
 [CmdletBinding()]
@@ -29,35 +29,35 @@ param(
 )
 
 begin {
-    Write-Verbose "Инициализация параметров..."
+    Write-Verbose "Initializing parameters..."
     $RegPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
     $CmdValue = "cmd /c `"$AppPath`""
 }
 
 process {
     try {
-        Write-Verbose "Добавление записи в реестр: $RegPath"
+        Write-Verbose "Adding registry entry: $RegPath"
         Set-ItemProperty -Path $RegPath -Name $AppName -Value $CmdValue -ErrorAction Stop
 
-        Write-Output "Запись '$AppName' успешно добавлена в автозагрузку."
+        Write-Output "Entry '$AppName' successfully added to startup."
 
-        Write-Verbose "Проверка результата..."
+        Write-Verbose "Verifying result..."
         $Check = Get-ItemProperty -Path $RegPath -ErrorAction Stop | Select-Object -Property $AppName
 
         if ($Check.$AppName -eq $CmdValue) {
-            Write-Output "Проверка завершена успешно:"
-            Write-Output "Имя: $AppName"
-            Write-Output "Значение: $($Check.$AppName)"
+            Write-Output "Verification completed successfully:"
+            Write-Output "Name: $AppName"
+            Write-Output "Value: $($Check.$AppName)"
         }
         else {
-            Write-Warning "Запись '$AppName' не совпадает с ожидаемым значением."
+            Write-Warning "Entry '$AppName' does not match the expected value."
         }
     }
     catch {
-        Write-Error "Ошибка при добавлении записи в автозагрузку: $($_.Exception.Message)"
+        Write-Error "Error adding entry to startup: $($_.Exception.Message)"
     }
 }
 
 end {
-    Write-Verbose "Завершение работы скрипта."
+    Write-Verbose "Script execution completed."
 }

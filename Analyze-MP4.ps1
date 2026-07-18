@@ -4,12 +4,12 @@ param(
 )
 
 if (!(Test-Path $InputFile)) {
-    Write-Host "Файл не найден: $InputFile" -ForegroundColor Red
+    Write-Host "File not found: $InputFile" -ForegroundColor Red
     exit 1
 }
 
 if (!(Get-Command ffprobe -ErrorAction SilentlyContinue)) {
-    Write-Host "ffprobe не найден." -ForegroundColor Red
+    Write-Host "ffprobe not found." -ForegroundColor Red
     exit 1
 }
 
@@ -30,7 +30,7 @@ function Run-Probe($ProbeArgs, $section) {
 
     $time = (Get-Date) - $start
 
-    Write-Host "    Готово за $([math]::Round($time.TotalSeconds,2)) сек." -ForegroundColor Green
+    Write-Host "    Completed in $([math]::Round($time.TotalSeconds,2)) sec." -ForegroundColor Green
 }
 
 
@@ -51,7 +51,7 @@ Run-Probe @(
     "-of",
     "default=noprint_wrappers=1",
     $InputFile
-) "Общая информация"
+) "General information"
 
 
 Run-Probe @(
@@ -61,7 +61,7 @@ Run-Probe @(
     "-of",
     "default=noprint_wrappers=1",
     $InputFile
-) "Информация о потоках"
+) "Stream information"
 
 
 Run-Probe @(
@@ -70,7 +70,7 @@ Run-Probe @(
     "-show_entries","stream",
     "-of","default=noprint_wrappers=1",
     $InputFile
-) "Видео поток"
+) "Video stream"
 
 
 Run-Probe @(
@@ -79,10 +79,10 @@ Run-Probe @(
     "-show_entries","stream",
     "-of","default=noprint_wrappers=1",
     $InputFile
-) "Аудио поток"
+) "Audio stream"
 
 
-Step "Подсчёт ключевых кадров"
+Step "Counting key frames"
 
 $start = Get-Date
 
@@ -99,8 +99,8 @@ $elapsed = (Get-Date) - $start
 "=== KEY FRAMES ===" | Out-File $OutputFile -Append
 "Key frames count: $($keyFrames.Count)" | Out-File $OutputFile -Append
 
-Write-Host "    Ключевых кадров: $($keyFrames.Count)"
-Write-Host "    Время: $([math]::Round($elapsed.TotalSeconds,2)) сек." -ForegroundColor Green
+Write-Host "    Key frames: $($keyFrames.Count)"
+Write-Host "    Time: $([math]::Round($elapsed.TotalSeconds,2)) sec." -ForegroundColor Green
 
 
 Run-Probe @(
@@ -109,11 +109,11 @@ Run-Probe @(
     "stream=index,codec_type,codec_name",
     "-of","table",
     $InputFile
-) "Проверка всех потоков"
+) "Checking all streams"
 
 
 Write-Host ""
 Write-Host "================================="
-Write-Host "Анализ завершён" -ForegroundColor Green
-Write-Host "Файл отчёта:"
+Write-Host "Analysis completed" -ForegroundColor Green
+Write-Host "Report file:"
 Write-Host $OutputFile
