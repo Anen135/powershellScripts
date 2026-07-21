@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 <#
 .SYNOPSIS
     Moves a folder to a new location and replaces the original path with a
@@ -33,8 +33,7 @@
 .EXAMPLE
     .\New-SymlinkMigration.ps1 -SourcePath "C:\Data\Projects" -DestinationPath "D:\Archive"
 
-.NOTES
-    Creating a symbolic link on Windows requires either:
+.NOTES`n    Version: 1.0`n    Author: Anen`n`n    Creating a symbolic link on Windows requires either:
       - An elevated (Run as Administrator) PowerShell session, OR
       - Developer Mode enabled (Windows 10 1703+/Windows 11), which grants
         the SeCreateSymbolicLinkPrivilege to standard users.
@@ -153,7 +152,7 @@ $checksPassed = $true
 if (Test-IsAdmin) {
     Write-Ok "Running with Administrator privileges."
 } elseif (Test-DeveloperModeEnabled) {
-    Write-Ok "Developer Mode is enabled — symlink creation permitted without elevation."
+    Write-Ok "Developer Mode is enabled вЂ” symlink creation permitted without elevation."
 } else {
     Write-Fail "Not elevated and Developer Mode is not enabled. Symbolic link creation will fail."
     Write-Host "    -> Re-run this script as Administrator, or enable Developer Mode." -ForegroundColor Yellow
@@ -266,14 +265,14 @@ if ($checksPassed) {
 }
 
 if (-not $checksPassed) {
-    Write-Host "`nPre-flight checks failed. Aborting — no changes were made." -ForegroundColor Red
+    Write-Host "`nPre-flight checks failed. Aborting вЂ” no changes were made." -ForegroundColor Red
     exit 1
 }
 
 Write-Ok "All security checks passed."
 
 # -------------------------------------------------------------------------
-# STEP 2 (paths already captured via parameters) — summary
+# STEP 2 (paths already captured via parameters) вЂ” summary
 # -------------------------------------------------------------------------
 Write-Step "Summary"
 Write-Host "    Source              : $SourcePath"
@@ -349,3 +348,4 @@ if ($PSCmdlet.ShouldProcess($SourcePath, "Create symbolic link -> $effectiveDest
 }
 
 Write-Host "`nDone. '$SourcePath' is now a symbolic link pointing to '$effectiveDestination'." -ForegroundColor Green
+

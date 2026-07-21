@@ -54,7 +54,7 @@
 
 .NOTES
     Version: 1.0
-    Author:  Anen
+    Author: Anen
 #>
 
 param(

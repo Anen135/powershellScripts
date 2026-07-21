@@ -1,16 +1,46 @@
-# =============================================
+﻿# =============================================
 # VPN Bypass Manager
-# Author: Anen135
-# Version: 2.1 — Rewritten using NetTCPIP (no route.exe)
 # =============================================
-# TODO:
-# 1. Add an editor for saved addresses.
-# 2. Add Refresh of saved domains (Note: Windows routing requires IPs, so this needs a background resolver).
-# 3. Test operation in a system with multiple interfaces (Including Ethernet).
-# NOTE: 
-# 1. I switched to using NETTCPIP, there may be errors related to this
-# 2. New-NetRoute may require to specify the interface ID
 
+<#
+.SYNOPSIS
+    Manages persistent network routes to bypass VPN for specific IPs or domains.
+
+.DESCRIPTION
+    Adds, removes, or lists persistent network routes using NetTCPIP cmdlets
+    (New-NetRoute / Remove-NetRoute) to bypass VPN for specified IP addresses
+    or domain names. The default gateway is auto-detected. Requires
+    Administrator privileges.
+
+.PARAMETER Add
+    Add a bypass route for the specified target.
+
+.PARAMETER Remove
+    Remove an existing bypass route for the specified target.
+
+.PARAMETER List
+    Display all persistent routes currently configured.
+
+.PARAMETER Target
+    IP address (e.g., 8.8.8.8) or domain name (e.g., google.com) to
+    bypass VPN for.
+
+.EXAMPLE
+    .\VPN-Bypass-Manager.ps1 -Add -Target google.com
+
+.EXAMPLE
+    .\VPN-Bypass-Manager.ps1 -Add -Target 8.8.8.8
+
+.EXAMPLE
+    .\VPN-Bypass-Manager.ps1 -Remove -Target google.com
+
+.EXAMPLE
+    .\VPN-Bypass-Manager.ps1 -List
+
+.NOTES
+    Version: 2.1
+    Author: Anen
+#>
 param(
     [Parameter(ParameterSetName='AddSet', Mandatory=$true)]
     [switch]$Add,
@@ -32,7 +62,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     exit 1
 }
 
-$DefaultGateway = ""  # If empty — auto-detected
+$DefaultGateway = ""  # If empty вЂ” auto-detected
 
 function Get-DefaultRouteInfo {
     $route = Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue | 
@@ -130,7 +160,7 @@ function Remove-Bypass {
                         $route = Get-NetRoute -DestinationPrefix "$ipStr/32" -PolicyStore PersistentStore -ErrorAction SilentlyContinue
                         if ($route) {
                             $route | Remove-NetRoute -Confirm:$false -ErrorAction Stop
-                            Write-Host "Removed: $ipStr  ← $Target" -ForegroundColor Yellow
+                            Write-Host "Removed: $ipStr  в†ђ $Target" -ForegroundColor Yellow
                         } else {
                             Write-Host "Route for $ipStr not found." -ForegroundColor Yellow
                         }
@@ -178,3 +208,4 @@ Write-Host ".\script.ps1 -Add -Target google.com" -ForegroundColor Gray
 Write-Host ".\script.ps1 -Add -Target 8.8.8.8" -ForegroundColor Gray
 Write-Host ".\script.ps1 -Remove -Target google.com" -ForegroundColor Gray
 Write-Host ".\script.ps1 -List" -ForegroundColor Gray
+

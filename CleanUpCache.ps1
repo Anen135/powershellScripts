@@ -1,5 +1,35 @@
-﻿# CleanUpCache.ps1
+﻿<#
+.SYNOPSIS
+    Cleans temporary files and caches based on a configurable path list.
 
+.DESCRIPTION
+    Reads a list of file and folder paths from a configuration file and
+    deletes their contents. Useful for freeing disk space by removing
+    browser caches (Edge, Chrome, Firefox, Opera), IDE caches, package
+    manager caches, messenger caches, and system temp files. Supports
+    WhatIf preview mode.
+
+.PARAMETER PathsFile
+    Path to the configuration file listing paths to clean.
+    Default: "C:\Program Files\WindowsPowerShell\Scripts\cache.txt".
+
+.PARAMETER WhatIf
+    Preview mode - displays what would be deleted without actually
+    deleting anything.
+
+.EXAMPLE
+    .\CleanUpCache.ps1
+
+.EXAMPLE
+    .\CleanUpCache.ps1 -WhatIf
+
+.EXAMPLE
+    .\CleanUpCache.ps1 -PathsFile "C:\Configs\my-cache-paths.txt"
+
+.NOTES
+    Version: 1.0
+    Author: Anen
+#>
 param(
     [string]$PathsFile = "C:\Program Files\WindowsPowerShell\Scripts\cache.txt", 
     [switch]$WhatIf                   

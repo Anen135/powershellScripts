@@ -1,5 +1,27 @@
-# V2
-# DirNav
+﻿<#
+.SYNOPSIS
+    Interactive console-based directory navigator with keyboard controls.
+
+.DESCRIPTION
+    An interactive TUI (console) file system browser that lets you navigate
+    directories, open files, delete empty folders/files, search by mask, and
+    browse the file tree using keyboard controls.
+
+    Keyboard shortcuts:
+    - Arrow keys   : Navigate through items (cyclic scrolling)
+    - Enter        : Open selected file or enter folder
+    - S / Backspace: Go to parent directory
+    - Delete (x2)  : Delete empty folder or file
+    - Q            : Search files by mask (recursive)
+    - Esc          : Exit (or exit search mode)
+
+.EXAMPLE
+    .\DirNav.ps1
+
+.NOTES
+    Version: 2.0
+    Author: Anen
+#>
 Add-Type -TypeDefinition @"
 public enum UserAction
 {

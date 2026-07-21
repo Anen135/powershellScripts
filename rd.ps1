@@ -1,3 +1,41 @@
+<#
+.SYNOPSIS
+    Moves a folder to a new location and replaces the original with a symbolic link.
+
+.DESCRIPTION
+    Uses Robocopy to move all contents from a source folder to a destination,
+    then replaces the original folder with a symbolic link pointing to the
+    new location. Supports dry-run preview and rollback of a previous move
+    operation. Requires Administrator privileges or Developer Mode for
+    symlink creation.
+
+.PARAMETER Source
+    Full path to the source folder to relocate.
+
+.PARAMETER Destination
+    Full path to the destination where folder contents will be moved.
+
+.PARAMETER DryRun
+    Preview mode — shows what would happen without making any changes.
+
+.PARAMETER Rollback
+    Undo a previous move operation by removing the symlink, recreating the
+    original folder, and moving data back from the destination.
+
+.EXAMPLE
+    .\rd.ps1 -Source "C:\Data\Projects" -Destination "D:\Archive"
+
+.EXAMPLE
+    .\rd.ps1 -Source "C:\Data\Projects" -Destination "D:\Archive" -DryRun
+
+.EXAMPLE
+    .\rd.ps1 -Source "C:\Data\Projects" -Destination "D:\Archive" -Rollback
+
+.NOTES
+    Version: 1.0
+    Author: Anen
+#>
+
 param (
     [Parameter(Mandatory = $true)]
     [ValidateScript({ Test-Path $_ -PathType Container })]

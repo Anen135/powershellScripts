@@ -1,3 +1,26 @@
+<#
+.SYNOPSIS
+    Analyzes MP4 video files using FFprobe and generates a detailed analysis report.
+
+.DESCRIPTION
+    Uses ffprobe to extract general format information, stream details,
+    video/audio stream properties, key frame counts, and produces a
+    comprehensive text-based analysis report alongside the source file.
+
+.PARAMETER InputFile
+    Path to the MP4 file to analyze.
+
+.EXAMPLE
+    .\Analyze-MP4.ps1 -InputFile "video.mp4"
+
+.EXAMPLE
+    .\Analyze-MP4.ps1 -InputFile "C:\Videos\sample.mp4"
+
+.NOTES
+    Version: 1.0
+    Author: Anen
+#>
+
 param(
     [Parameter(Mandatory=$true)]
     [string]$InputFile

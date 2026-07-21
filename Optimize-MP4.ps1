@@ -1,3 +1,26 @@
+<#
+.SYNOPSIS
+    Cleans and optimizes MP4 files by removing metadata and optimizing for streaming.
+
+.DESCRIPTION
+    Processes all MP4 files in the current directory using FFmpeg.
+    Strips all metadata, adds a faststart moov atom for web optimization,
+    and copies video/audio streams without re-encoding (lossless).
+
+.PARAMETER OutputDir
+    Directory where cleaned files will be saved. Default: "cleaned".
+
+.EXAMPLE
+    Optimize-MP4
+
+.EXAMPLE
+    Optimize-MP4 -OutputDir "optimized_videos"
+
+.NOTES
+    Version: 1.0
+    Author: Anen
+#>
+
 function Optimize-MP4 {
     param(
         [string]$OutputDir = "cleaned"

@@ -7,7 +7,7 @@
     then outputs the network name (SSID) and its password if available.
 
 .NOTES
-    Version: 2.3 Encoding fix
+    Version: 2.3
     Author: Anen
 #>
 

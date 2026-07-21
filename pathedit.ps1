@@ -1,4 +1,32 @@
-# === PATH Editor ===
+﻿<#
+.SYNOPSIS
+    Interactive TUI editor for viewing and modifying PATH environment variables.
+
+.DESCRIPTION
+    An interactive console-based editor for managing User PATH entries.
+    Supports navigation with arrow keys, editing entries, deleting with
+    confirmation, saving changes to User scope, adding the current
+    working directory, and searching for specific paths.
+
+.PARAMETER Current
+    Add the current working directory to the User PATH.
+
+.PARAMETER Find
+    Check if a specific path exists in the current PATH variable.
+
+.EXAMPLE
+    .\pathedit.ps1
+
+.EXAMPLE
+    .\pathedit.ps1 -Current
+
+.EXAMPLE
+    .\pathedit.ps1 -Find "C:\Tools"
+
+.NOTES
+    Version: 1.0
+    Author: Anen
+#>
 param( [switch]$Current, [string]$Find)
 if ($Current) {
     $currentPath = (Get-Location).Path
