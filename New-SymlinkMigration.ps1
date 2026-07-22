@@ -33,7 +33,11 @@
 .EXAMPLE
     .\New-SymlinkMigration.ps1 -SourcePath "C:\Data\Projects" -DestinationPath "D:\Archive"
 
-.NOTES`n    Version: 1.0`n    Author: Anen`n`n    Creating a symbolic link on Windows requires either:
+.NOTES
+    Version: 1.0
+    Author: Anen
+
+    Creating a symbolic link on Windows requires either:
       - An elevated (Run as Administrator) PowerShell session, OR
       - Developer Mode enabled (Windows 10 1703+/Windows 11), which grants
         the SeCreateSymbolicLinkPrivilege to standard users.
