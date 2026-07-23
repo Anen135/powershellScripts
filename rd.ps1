@@ -58,13 +58,15 @@ function Log {
     }
 }
 
-function Normalize-Path {
+function Resolve-Path {
     param([string]$Path)
-    return [System.IO.Path]::GetFullPath($Path).TrimEnd('\')
+    $full = [System.IO.Path]::GetFullPath($Path)
+    if ($full.Length -gt 3) { $full = $full.TrimEnd('\') }
+    $full
 }
 
 try {
-    $Source = Normalize-Path $Source
+    $Source = Resolve-Path $Source
     if (-not (Test-Path $Source -PathType Container)) {
         throw "Source path does not exist or is not a directory: $Source"
     }
@@ -72,7 +74,7 @@ try {
 catch {
     throw "Invalid path provided: $_"
 }
-$Destination = Normalize-Path $Destination
+$Destination = Resolve-Path $Destination
 
 $LogFile = Join-Path $env:TEMP "robomove_$(Get-Date -Format yyyyMMdd_HHmmss).log"
 

@@ -93,7 +93,7 @@ Scripts that currently have **no comment-based help** at all:
 | `rd.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
 | `Zip-Converter.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
 
-### 4. 🟡 Upgrade Minimal Headers (3 scripts) — ✅ DONE
+### 4. 🟢 Upgrade Minimal Headers (3 scripts) — ✅ DONE
 Scripts that had only `#` line comments instead of proper help:
 
 | Script | Current | Action | Status |
@@ -102,7 +102,7 @@ Scripts that had only `#` line comments instead of proper help:
 | `VPN-Bypass-Manager.ps1` | Simple `#` header block | Convert to proper comment-based help | ✅ Already has full help block |
 | `pathedit.ps1` | `# === PATH Editor ===` | Add full `<# #>` help block | ✅ Already has full help block |
 
-### 5. 🟡 Unify Author Field — ✅ DONE
+### 5. 🟢 Unify Author Field — ✅ DONE
 All 18 scripts already have `Author: Anen` (verified by reading every file).
 
 | Value | Scripts | Status |
@@ -130,7 +130,7 @@ Scripts currently **missing** `[CmdletBinding()]`:
 
 **Note:** Scripts that are purely function libraries (ApiTool, touch, Optimize-MP4, Zip-Converter) should have `[CmdletBinding()]` on their function declarations instead.
 
-### 7. 🟡 Standardize Output Patterns
+### 7. 🟢 Standardize Output Patterns - ✅ DONE
 **Rule:** Use `Write-Output` for data, `Write-Host` only for display/colored progress messages, and `Write-Error` / `Write-Warning` for error conditions.
 
 Scripts needing review:
@@ -140,12 +140,7 @@ Scripts needing review:
 - Analyze-MP4.ps1 — uses `Write-Host` for all output
 
 ### 8. 🟡 Align Error Handling
-**Standard:** `try/catch` → `Write-Error` + `exit 1` for scripts; `throw` for reusable functions.
-
-Scripts to review:
-- New-SymlinkMigration.ps1 — uses `throw` at script level (as a script, should use `Write-Error`)
-- Zip-Converter.ps1 — uses `throw` (as a function library, this is correct)
-- rd.ps1 — uses `throw` (script, should use `Write-Error`)
+**Standard:** `try/catch` → `Write-Error` + `exit 1` for all;
 
 ### 9. ⚪ Normalize Version Format
 **Standard:** `Version: X.Y` (no extra text after the number)

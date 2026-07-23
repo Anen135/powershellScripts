@@ -76,7 +76,7 @@ foreach ($rawPath in $paths) {
                         if ($child.PSIsContainer) { $totalFoldersDeleted++ } else { $totalFilesDeleted++ }
                         Write-Host "Deleted: $($child.FullName)" -ForegroundColor Green
                     } catch {
-                        Write-Warning "Failed to delete $($child.FullName): $_"
+                        Write-Error "Failed to delete $($child.FullName): $_"
                         $totalErrors++
                         $failedItems += $child.FullName
                     }
@@ -90,13 +90,13 @@ foreach ($rawPath in $paths) {
                 $totalFilesDeleted++
                 Write-Host "File deleted: $path" -ForegroundColor Green
             } catch {
-                Write-Warning "Failed to delete file ${path}: $_"
+                Write-Error "Failed to delete file ${path}: $_"
                 $totalErrors++
                 $failedItems += $path
             }
         }
     } catch {
-        Write-Warning "Failed to process path ${path}: $_"
+        Write-Error "Failed to process path ${path}: $_"
         $totalErrors++
         $failedItems += $path
     }

@@ -27,12 +27,12 @@ param(
 )
 
 if (!(Test-Path $InputFile)) {
-    Write-Host "File not found: $InputFile" -ForegroundColor Red
+    Write-Error "File not found: $InputFile"
     exit 1
 }
 
 if (!(Get-Command ffprobe -ErrorAction SilentlyContinue)) {
-    Write-Host "ffprobe not found." -ForegroundColor Red
+    Write-Error "ffprobe not found."
     exit 1
 }
 

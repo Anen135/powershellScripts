@@ -62,7 +62,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
     exit 1
 }
 
-$DefaultGateway = ""  # If empty вЂ” auto-detected
+$DefaultGateway = ""  # If empty — auto-detected
 
 function Get-DefaultRouteInfo {
     $route = Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue | 
@@ -104,7 +104,7 @@ function Add-Bypass {
             New-NetRoute -DestinationPrefix "$Target/32" -NextHop $DefaultGateway -ErrorAction Stop | Out-Null
             Write-Host "Added: $Target" -ForegroundColor Green
         } catch {
-            Write-Host "Error adding $Target : $_" -ForegroundColor Red
+            Write-Error "Error adding $Target : $_"
         }
     }
     else {
@@ -118,14 +118,14 @@ function Add-Bypass {
                         New-NetRoute -DestinationPrefix "$ipStr/32" -NextHop $DefaultGateway -ErrorAction Stop | Out-Null
                         Write-Host "Added: $ipStr <== $Target" -ForegroundColor Green
                     } catch {
-                        Write-Host "Error adding $ipStr : $_" -ForegroundColor Red
+                        Write-Error "Error adding $ipStr : $_"
                     }
                 }
             } else {
-                Write-Host "Domain resolved, but no IPv4 addresses found for: $Target" -ForegroundColor Yellow
+                Write-Warning "Domain resolved, but no IPv4 addresses found for: $Target"
             }
         } catch {
-            Write-Host "Could not resolve domain: $Target" -ForegroundColor Red
+            Write-Error "Could not resolve domain: $Target"
         }
     }
 }
@@ -143,10 +143,10 @@ function Remove-Bypass {
                 $route | Remove-NetRoute -Confirm:$false -ErrorAction Stop
                 Write-Host "Removed: $Target" -ForegroundColor Yellow
             } else {
-                Write-Host "Route for $Target not found in PersistentStore." -ForegroundColor Yellow
+                Write-Warning "Route for $Target not found in PersistentStore."
             }
         } catch {
-            Write-Host "Error removing $Target : $_" -ForegroundColor Red
+            Write-Error "Error removing $Target : $_"
         }
     }
     else {
@@ -160,19 +160,19 @@ function Remove-Bypass {
                         $route = Get-NetRoute -DestinationPrefix "$ipStr/32" -PolicyStore PersistentStore -ErrorAction SilentlyContinue
                         if ($route) {
                             $route | Remove-NetRoute -Confirm:$false -ErrorAction Stop
-                            Write-Host "Removed: $ipStr  в†ђ $Target" -ForegroundColor Yellow
+                            Write-Host "Removed: $ipStr  ← $Target" -ForegroundColor Yellow
                         } else {
-                            Write-Host "Route for $ipStr not found." -ForegroundColor Yellow
+                            Write-Warning "Route for $ipStr not found."
                         }
                     } catch {
-                        Write-Host "Error removing $ipStr : $_" -ForegroundColor Red
+                        Write-Error "Error removing $ipStr : $_"
                     }
                 }
             } else {
-                Write-Host "Domain resolved, but no IPv4 addresses found for: $Target" -ForegroundColor Yellow
+                Write-Warning "Domain resolved, but no IPv4 addresses found for: $Target"
             }
         } catch {
-            Write-Host "Could not resolve domain: $Target" -ForegroundColor Red
+            Write-Error "Could not resolve domain: $Target"
         }
     }
 }
@@ -186,7 +186,7 @@ if ($List) {
     if ($routes) {
         $routes | Format-Table -Property DestinationPrefix, NextHop, RouteMetric, InterfaceIndex -AutoSize
     } else {
-        Write-Host "No persistent routes found." -ForegroundColor Yellow
+        Write-Warning "No persistent routes found."
     }
     return
 }
@@ -208,4 +208,3 @@ Write-Host ".\script.ps1 -Add -Target google.com" -ForegroundColor Gray
 Write-Host ".\script.ps1 -Add -Target 8.8.8.8" -ForegroundColor Gray
 Write-Host ".\script.ps1 -Remove -Target google.com" -ForegroundColor Gray
 Write-Host ".\script.ps1 -List" -ForegroundColor Gray
-
