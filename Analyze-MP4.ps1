@@ -43,7 +43,7 @@ function Step($text) {
     Write-Host "[*] $text [$((Get-Date).TimeOfDay)]" -ForegroundColor Cyan
 }
 
-function Run-Probe($ProbeArgs, $section) {
+function Start-Probe($ProbeArgs, $section) {
     Step $section
 
     $start = Get-Date
@@ -61,13 +61,13 @@ Remove-Item $OutputFile -ErrorAction SilentlyContinue
 
 
 "======================================" | Out-File $OutputFile
-"FFmpeg MP4 ANALYSIS REPORT" | Out-File $OutputFile -Append
-"File: $InputFile" | Out-File $OutputFile -Append
-"Date: $(Get-Date)" | Out-File $OutputFile -Append
+"FFmpeg MP4 ANALYSIS REPORT"             | Out-File $OutputFile -Append
+"File: $InputFile"                       | Out-File $OutputFile -Append
+"Date: $(Get-Date)"                      | Out-File $OutputFile -Append
 "======================================" | Out-File $OutputFile -Append
 
 
-Run-Probe @(
+Start-Probe @(
     "-v","error",
     "-show_entries",
     "format=filename,format_name,duration,size,bit_rate",
@@ -77,7 +77,7 @@ Run-Probe @(
 ) "General information"
 
 
-Run-Probe @(
+Start-Probe @(
     "-v","error",
     "-show_entries",
     "stream=index,codec_type,codec_name,profile,level,width,height,pix_fmt,r_frame_rate,avg_frame_rate,bit_rate,channels,sample_rate",
@@ -87,7 +87,7 @@ Run-Probe @(
 ) "Stream information"
 
 
-Run-Probe @(
+Start-Probe @(
     "-v","error",
     "-select_streams","v:0",
     "-show_entries","stream",
@@ -96,7 +96,7 @@ Run-Probe @(
 ) "Video stream"
 
 
-Run-Probe @(
+Start-Probe @(
     "-v","error",
     "-select_streams","a:0",
     "-show_entries","stream",
@@ -119,14 +119,14 @@ $keyFrames = ffprobe `
 
 $elapsed = (Get-Date) - $start
 
-"=== KEY FRAMES ===" | Out-File $OutputFile -Append
+"=== KEY FRAMES ==="                    | Out-File $OutputFile -Append
 "Key frames count: $($keyFrames.Count)" | Out-File $OutputFile -Append
 
 Write-Host "    Key frames: $($keyFrames.Count)"
 Write-Host "    Time: $([math]::Round($elapsed.TotalSeconds,2)) sec." -ForegroundColor Green
 
 
-Run-Probe @(
+Start-Probe @(
     "-v","error",
     "-show_entries",
     "stream=index,codec_type,codec_name",

@@ -156,7 +156,7 @@ $checksPassed = $true
 if (Test-IsAdmin) {
     Write-Ok "Running with Administrator privileges."
 } elseif (Test-DeveloperModeEnabled) {
-    Write-Ok "Developer Mode is enabled вЂ” symlink creation permitted without elevation."
+    Write-Ok "Developer Mode is enabled symlink creation permitted without elevation."
 } else {
     Write-Fail "Not elevated and Developer Mode is not enabled. Symbolic link creation will fail."
     Write-Host "    -> Re-run this script as Administrator, or enable Developer Mode." -ForegroundColor Yellow
@@ -269,7 +269,7 @@ if ($checksPassed) {
 }
 
 if (-not $checksPassed) {
-    Write-Host "`nPre-flight checks failed. Aborting вЂ” no changes were made." -ForegroundColor Red
+    Write-Host "`nPre-flight checks failed. Aborting, no changes were made." -ForegroundColor Red
     exit 1
 }
 

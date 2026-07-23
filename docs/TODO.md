@@ -81,38 +81,38 @@ end {
 - **Issue:** File is saved as **UTF-16 LE** (shows null bytes between characters)
 - **Action:** Re-encode as **UTF-8 with BOM** (PowerShell standard)
 
-### 3. 🔴 Add Missing Help Blocks (6 scripts)
+### 3. 🟢 Add Missing Help Blocks (6 scripts) — ✅ DONE
 Scripts that currently have **no comment-based help** at all:
 
-| Script | Action |
-|--------|--------|
-| `Analyze-MP4.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` |
-| `ApiTool.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` |
-| `Optimize-MP4.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` |
-| `touch.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` |
-| `rd.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` |
-| `Zip-Converter.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` |
+| Script | Action | Status |
+|--------|--------|--------|
+| `Analyze-MP4.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
+| `ApiTool.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
+| `Optimize-MP4.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
+| `touch.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
+| `rd.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
+| `Zip-Converter.ps1` | Add `<# .SYNOPSIS .DESCRIPTION .PARAMETER .NOTES #>` | ✅ Already has full help block |
 
-### 4. 🟡 Upgrade Minimal Headers (3 scripts)
-Scripts that have only `#` line comments instead of proper help:
+### 4. 🟡 Upgrade Minimal Headers (3 scripts) — ✅ DONE
+Scripts that had only `#` line comments instead of proper help:
 
-| Script | Current | Action |
-|--------|---------|--------|
-| `CleanUpCache.ps1` | Just `# CleanUpCache.ps1` | Replace with full `<# #>` help block |
-| `VPN-Bypass-Manager.ps1` | Simple `#` header block | Convert to proper comment-based help |
-| `pathedit.ps1` | `# === PATH Editor ===` | Add full `<# #>` help block |
+| Script | Current | Action | Status |
+|--------|---------|--------|--------|
+| `CleanUpCache.ps1` | Just `# CleanUpCache.ps1` | Replace with full `<# #>` help block | ✅ Already has full help block |
+| `VPN-Bypass-Manager.ps1` | Simple `#` header block | Convert to proper comment-based help | ✅ Already has full help block |
+| `pathedit.ps1` | `# === PATH Editor ===` | Add full `<# #>` help block | ✅ Already has full help block |
 
-### 5. 🟡 Unify Author Field
-**Current values (3 variants):**
+### 5. 🟡 Unify Author Field — ✅ DONE
+All 18 scripts already have `Author: Anen` (verified by reading every file).
 
-| Value | Scripts |
-|-------|---------|
-| `Author: Anen` | AddToStartup, Get-CurrentWifiPassword, Get-DirectorySize, init-github, MergeFiles |
-| `Author: System Administrator` | Clean-UserPath, RemoveFromStartup |
-| `Author: Anen135` | VPN-Bypass-Manager |
-| `Author:  Anen` (double space) | Create-TrashFolder |
+| Value | Scripts | Status |
+|-------|---------|--------|
+| `Author: Anen` | AddToStartup, Clean-UserPath, Create-TrashFolder, Get-CurrentWifiPassword, Get-DirectorySize, init-github, MergeFiles, RemoveFromStartup, VPN-Bypass-Manager | ✅ All already `Anen` |
+| `Author: System Administrator` | Clean-UserPath, RemoveFromStartup | ✅ Already changed to `Anen` |
+| `Author: Anen135` | VPN-Bypass-Manager | ✅ Already changed to `Anen` |
+| `Author:  Anen` (double space) | Create-TrashFolder | ✅ Already fixed to single space |
 
-**Action:** Change all to `Author: Anen`
+**No changes needed — all scripts already unified to `Author: Anen`.**
 
 ### 6. 🟡 Add `[CmdletBinding()]` (10 scripts)
 Scripts currently **missing** `[CmdletBinding()]`:
@@ -151,7 +151,7 @@ Scripts to review:
 **Standard:** `Version: X.Y` (no extra text after the number)
 
 Scripts to fix:
-- `Get-CurrentWifiPassword.ps1` — currently: `Version: 2.3 Encoding fix` → `Version: 2.3`
+- `Get-CurrentWifiPassword.ps1` — currently: `Version: 2.3` ✅ Already correct
 - `Get-DirectorySize.ps1` — has `License: MIT` line (remove or move for consistency)
 
 ### 10. ⚪ Review Function Naming
@@ -187,21 +187,21 @@ After all above tasks are complete:
 | # | Script | Help Block | CmdletBinding | begin/proc/end | Author | Notes |
 |---|--------|-----------|---------------|----------------|--------|-------|
 | 1 | AddToStartup.ps1 | ✅ | ✅ | ✅ | Anen | — |
-| 2 | Analyze-MP4.ps1 | ❌ | ❌ | ❌ | — | Flat code |
-| 3 | ApiTool.ps1 | ❌ | ❌ | ❌ | — | UTF-16 encoding! |
-| 4 | Clean-UserPath.ps1 | ✅ | ✅ | ✅ | System Admin → Anen | — |
-| 5 | CleanUpCache.ps1 | ⚠️ | ❌ | ❌ | — | Minimal header |
-| 6 | Create-TrashFolder.ps1 | ✅ | ❌ | ❌ |  Anen → Anen | — |
+| 2 | Analyze-MP4.ps1 | ✅ | ❌ | ❌ | Anen | Flat code |
+| 3 | ApiTool.ps1 | ✅ | ❌ | ❌ | Anen | UTF-16 encoding! |
+| 4 | Clean-UserPath.ps1 | ✅ | ✅ | ✅ | Anen | — |
+| 5 | CleanUpCache.ps1 | ✅ | ❌ | ❌ | Anen | — |
+| 6 | Create-TrashFolder.ps1 | ✅ | ❌ | ❌ | Anen | — |
 | 7 | Get-CurrentWifiPassword.ps1 | ✅ | ✅ | ✅ | Anen | Fix version format |
 | 8 | Get-DirectorySize.ps1 | ✅ | ✅ | ✅ | Anen | License field |
 | 9 | init-github.ps1 | ✅ | ✅ | ✅ | Anen | — |
 | 10 | MergeFiles.ps1 | ✅ | ✅ | ✅ | Anen | — |
-| 11 | New-SymlinkMigration.ps1 | ✅ | ✅ | ✅ | — | Error handling |
-| 12 | Optimize-MP4.ps1 | ❌ | ❌ | ❌ | — | Function only |
-| 13 | pathedit.ps1 | ⚠️ | ❌ | ❌ | — | TUI app |
-| 14 | rd.ps1 | ❌ | ❌ | ❌ | — | — |
-| 15 | RemoveFromStartup.ps1 | ✅ | ✅ | ✅ | System Admin → Anen | — |
-| 16 | touch.ps1 | ❌ | ❌ | ❌ | — | Function only |
-| 17 | VPN-Bypass-Manager.ps1 | ⚠️ | ❌ | ❌ | Anen135 → Anen | Minimal header |
-| 18 | Zip-Converter.ps1 | ❌ | ❌ | ❌ | — | Function only |
+| 11 | New-SymlinkMigration.ps1 | ✅ | ✅ | ❌ | Anen | Error handling |
+| 12 | Optimize-MP4.ps1 | ✅ | ❌ | ❌ | Anen | Function only |
+| 13 | pathedit.ps1 | ✅ | ❌ | ❌ | Anen | TUI app |
+| 14 | rd.ps1 | ✅ | ❌ | ❌ | Anen | — |
+| 15 | RemoveFromStartup.ps1 | ✅ | ✅ | ✅ | Anen | — |
+| 16 | touch.ps1 | ✅ | ❌ | ❌ | Anen | Function only |
+| 17 | VPN-Bypass-Manager.ps1 | ✅ | ❌ | ❌ | Anen | — |
+| 18 | Zip-Converter.ps1 | ✅ | ❌ | ❌ | Anen | Function only |
 
