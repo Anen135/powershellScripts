@@ -74,7 +74,6 @@
 .NOTES
     Version: 3.0
     Author: Anen
-    License: MIT
 #>
 
 [CmdletBinding()]

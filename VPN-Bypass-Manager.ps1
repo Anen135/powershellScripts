@@ -91,8 +91,6 @@ if (-not $DefaultGateway) {
     Write-Host "Automatically detected gateway: $DefaultGateway" -ForegroundColor Cyan
 }
 
-$InterfaceIndex = $routeInfo.InterfaceIndex
-
 function Add-Bypass {
     param([string]$Target)
 
@@ -183,17 +181,21 @@ function Remove-Bypass {
     }
 }
 
-# ====================== MODES ======================
-if ($List) {
+function Show-List {
     Write-Host "Persistent Routes (excluding default routes):" -ForegroundColor Cyan
     $routes = Get-NetRoute -PolicyStore PersistentStore -ErrorAction SilentlyContinue | 
-              Where-Object { $_.DestinationPrefix -ne '0.0.0.0/0' -and $_.DestinationPrefix -ne '::/0' }
+            Where-Object { $_.DestinationPrefix -ne '0.0.0.0/0' -and $_.DestinationPrefix -ne '::/0' }
     
     if ($routes) {
         $routes | Format-Table -Property DestinationPrefix, NextHop, RouteMetric, InterfaceIndex -AutoSize
     } else {
         Write-Warning "No persistent routes found."
     }
+}
+
+# ====================== MODES ======================
+if ($List) {
+    Show-List
     return
 }
 

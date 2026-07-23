@@ -48,7 +48,7 @@ param (
     [switch]$Rollback
 )
 
-function Log {
+function Write-Log {
     param([string]$Message, [string]$Color = "White")
     if ($DryRun) {
         Write-Host "[DRY-RUN] $Message" -ForegroundColor Yellow
@@ -80,7 +80,7 @@ $LogFile = Join-Path $env:TEMP "robomove_$(Get-Date -Format yyyyMMdd_HHmmss).log
 
 
 if ($Rollback) {
-    Log "Rollback mode activated" -Color Cyan
+    Write-Log "Rollback mode activated" -Color Cyan
 
     
     if (-not (Test-Path $Source)) { throw "Source path does not exist: $Source" }
@@ -91,20 +91,20 @@ if ($Rollback) {
         throw "Source path is not a symbolic link: $Source"
     }
 
-    Log "Removing symbolic link at $Source"
+    Write-Log "Removing symbolic link at $Source"
     if (-not $DryRun) { Remove-Item $Source -Recurse -Force }
 
-    Log "Recreating directory at $Source"
+    Write-Log "Recreating directory at $Source"
     if (-not $DryRun) { New-Item -ItemType Directory -Path $Source -Force | Out-Null }
 
-    Log "Moving data back from $Destination to $Source (using /MOV)"
+    Write-Log "Moving data back from $Destination to $Source (using /MOV)"
     $robocopyArgs = @(
     $Destination, $Source,
     "/MOV", "/E", "/MT:16", "/R:3", "/W:5"
     )
     if ($DryRun) { $robocopyArgs += "/L" }
 
-    Log "robocopy $($robocopyArgs -join ' ')"
+    Write-Log "robocopy $($robocopyArgs -join ' ')"
 
     if (-not $DryRun) {
 
@@ -126,43 +126,43 @@ if ($Rollback) {
         throw "Robocopy failed during rollback (code $exitCode). Data may be incomplete. See log: $LogFile"
     }
     if ($exitCode -gt 1) {
-        Log "Robocopy completed rollback with warnings (code $exitCode). Check log." -Color Magenta
+        Write-Log "Robocopy completed rollback with warnings (code $exitCode). Check log." -Color Magenta
     }
         
         $remaining = Get-ChildItem -Path $Destination -Recurse -File -Force -ErrorAction SilentlyContinue
         if ($remaining) {
-            Log "Warning: $Destination is not empty after move ($($remaining.Count) files remain). Leaving it intact." -Color Yellow
+            Write-Log "Warning: $Destination is not empty after move ($($remaining.Count) files remain). Leaving it intact." -Color Yellow
         }
         else {
-            Log "Destination is now empty. Removing $Destination"
+            Write-Log "Destination is now empty. Removing $Destination"
             Remove-Item $Destination -Recurse -Force
         }
     }
 
-        Log "Rollback completed successfully. Original location restored." -Color Green
+        Write-Log "Rollback completed successfully. Original location restored." -Color Green
         exit 0
 }
 
 
 
-Log "Starting move operation: $Source -> $Destination" -Color Cyan
+Write-Log "Starting move operation: $Source -> $Destination" -Color Cyan
 
 
 $items = Get-ChildItem $Source -Force -ErrorAction SilentlyContinue
 if ($items.Count -eq 0) {
-    Log "Source folder is already empty"
+    Write-Log "Source folder is already empty"
 
     if (-not (Test-Path $Destination)) {
-        Log "Creating destination directory: $Destination"
+        Write-Log "Creating destination directory: $Destination"
         if (-not $DryRun) { New-Item -ItemType Directory -Path $Destination -Force | Out-Null }
     }
 
-    Log "Removing empty source and creating symlink"
+    Write-Log "Removing empty source and creating symlink"
     if (-not $DryRun) {
         Remove-Item $Source -Recurse -Force
         try {
             New-Item -ItemType SymbolicLink -Path $Source -Target $Destination -ErrorAction Stop | Out-Null
-            Log "Success: Empty folder replaced with symlink $Source -> $Destination" -Color Green
+            Write-Log "Success: Empty folder replaced with symlink $Source -> $Destination" -Color Green
         }
         catch {
             throw "Failed to create symbolic link. Run as Administrator or enable Developer Mode. Error: $_"
@@ -173,12 +173,12 @@ if ($items.Count -eq 0) {
 
 
 if (-not (Test-Path $Destination)) {
-    Log "Creating destination directory: $Destination"
+    Write-Log "Creating destination directory: $Destination"
     if (-not $DryRun) { New-Item -ItemType Directory -Path $Destination -Force | Out-Null }
 }
 
 
-Log "Copying and moving files (this may take a while for large directories)"
+Write-Log "Copying and moving files (this may take a while for large directories)"
 
 
 $robocopyArgs = @(
@@ -187,7 +187,7 @@ $robocopyArgs = @(
 )
 if ($DryRun) { $robocopyArgs += "/L" }
 
-Log "robocopy $($robocopyArgs -join ' ')"
+Write-Log "robocopy $($robocopyArgs -join ' ')"
 
 if (-not $DryRun) {
 
@@ -211,7 +211,7 @@ if (-not $DryRun) {
         throw "Robocopy failed with serious errors (code $exitCode). Aborting to prevent data loss. See log: $LogFile"
     }
     if ($exitCode -gt 1) {
-        Log "Robocopy completed with some issues (code $exitCode). Check log: $LogFile" -Color Magenta
+        Write-Log "Robocopy completed with some issues (code $exitCode). Check log: $LogFile" -Color Magenta
     }
 }
 
@@ -224,20 +224,20 @@ if (-not $DryRun) {
 }
 
 
-Log "Removing original directory and creating symbolic link"
+Write-Log "Removing original directory and creating symbolic link"
 if (-not $DryRun) {
     Remove-Item $Source -Recurse -Force
 
     try {
         New-Item -ItemType SymbolicLink -Path $Source -Target $Destination -ErrorAction Stop | Out-Null
-        Log "SUCCESS: Data moved and symbolic link created: $Source -> $Destination" -Color Green
-        Log "Robocopy log saved to: $LogFile" -Color Cyan
+        Write-Log "SUCCESS: Data moved and symbolic link created: $Source -> $Destination" -Color Green
+        Write-Log "Robocopy log saved to: $LogFile" -Color Cyan
     }
     catch {
         throw "Failed to create symbolic link. Requires Administrator rights or Developer Mode enabled. Error: $_"
     }
 }
 else {
-    Log "Dry-run complete. No changes made." -Color Yellow
-    Log "Planned robocopy log would be: $LogFile" -Color Cyan
+    Write-Log "Dry-run complete. No changes made." -Color Yellow
+    Write-Log "Planned robocopy log would be: $LogFile" -Color Cyan
 }

@@ -76,7 +76,7 @@ end {
   - README.md and LICENSE.txt addition
   - Refactoring and bug fixes
 
-### 2. 🔴 Fix ApiTool.ps1 Encoding
+### 2. 🟢 Fix ApiTool.ps1 Encoding — ✅ DONE
 - **File:** `ApiTool.ps1`
 - **Issue:** File is saved as **UTF-16 LE** (shows null bytes between characters)
 - **Action:** Re-encode as **UTF-8 with BOM** (PowerShell standard)
@@ -114,7 +114,46 @@ All 18 scripts already have `Author: Anen` (verified by reading every file).
 
 **No changes needed — all scripts already unified to `Author: Anen`.**
 
-### 6. 🟡 Add `[CmdletBinding()]` (10 scripts)
+
+
+### 7. 🟢 Standardize Output Patterns - ✅ DONE
+**Rule:** Use `Write-Output` for data, `Write-Host` only for display/colored progress messages, and `Write-Error` / `Write-Warning` for error conditions.
+
+Scripts needing review:
+- CleanUpCache.ps1 — uses all `Write-Host` for status
+- rd.ps1 — uses `Write-Host` for everything
+- VPN-Bypass-Manager.ps1 — uses `Write-Host` for errors
+- Analyze-MP4.ps1 — uses `Write-Host` for all output
+
+### 8. 🟢 Align Error Handling - ✅ DONE
+**Standard:** `try/catch` → `Write-Error` + `throw` for all;
+
+### 9. 🟢 Normalize Version Format - ✅ DONE
+**Standard:** `Version: X.Y` (no extra text after the number)
+
+Scripts to fix:
+- `Get-CurrentWifiPassword.ps1` — currently: `Version: 2.3` ✅ Already correct
+- `Get-DirectorySize.ps1` — has `License: MIT` line ✅ Removed 
+
+### 10. ⚪ Review Function Naming
+**Standard:** `Verb-Noun` PascalCase
+
+Scripts to review:
+- `pathedit.ps1` — all functions are PascalCase ✅
+- `rd.ps1` — `Log`, `Normalize-Path` — `Log` should be `Write-Log` to follow convention ✅
+- `VPN-Bypass-Manager.ps1` — `Add-Bypass`, `Remove-Bypass` ✅, `Get-DefaultRouteInfo` ✅
+
+### 11. ⚪ Standardize Parameter Validation
+Add validation attributes where appropriate across all scripts:
+- `[ValidateNotNullOrEmpty()]` for mandatory strings
+- `[ValidateScript()]` for path validation
+- `[ValidateSet()]` where applicable
+
+### 12. ⚪ Compare rd.ps1 and New-SymlinkMigration.
+Check if two scripts are performing the same task, and if so, combine them into one script using the best of both.
+
+## Not obligatory
+### ⚪ Add `[CmdletBinding()]` (10 scripts)
 Scripts currently **missing** `[CmdletBinding()]`:
 
 - Analyze-MP4.ps1
@@ -129,39 +168,6 @@ Scripts currently **missing** `[CmdletBinding()]`:
 - ApiTool.ps1 (function-level)
 
 **Note:** Scripts that are purely function libraries (ApiTool, touch, Optimize-MP4, Zip-Converter) should have `[CmdletBinding()]` on their function declarations instead.
-
-### 7. 🟢 Standardize Output Patterns - ✅ DONE
-**Rule:** Use `Write-Output` for data, `Write-Host` only for display/colored progress messages, and `Write-Error` / `Write-Warning` for error conditions.
-
-Scripts needing review:
-- CleanUpCache.ps1 — uses all `Write-Host` for status
-- rd.ps1 — uses `Write-Host` for everything
-- VPN-Bypass-Manager.ps1 — uses `Write-Host` for errors
-- Analyze-MP4.ps1 — uses `Write-Host` for all output
-
-### 8. 🟡 Align Error Handling
-**Standard:** `try/catch` → `Write-Error` + `throw` for all;
-
-### 9. ⚪ Normalize Version Format
-**Standard:** `Version: X.Y` (no extra text after the number)
-
-Scripts to fix:
-- `Get-CurrentWifiPassword.ps1` — currently: `Version: 2.3` ✅ Already correct
-- `Get-DirectorySize.ps1` — has `License: MIT` line (remove or move for consistency)
-
-### 10. ⚪ Review Function Naming
-**Standard:** `Verb-Noun` PascalCase
-
-Scripts to review:
-- `pathedit.ps1` — all functions are PascalCase ✅
-- `rd.ps1` — `Log`, `Normalize-Path` — `Log` should be `Write-Log` to follow convention
-- `VPN-Bypass-Manager.ps1` — `Add-Bypass`, `Remove-Bypass` ✅, `Get-DefaultRouteInfo` ✅
-
-### 11. ⚪ Standardize Parameter Validation
-Add validation attributes where appropriate across all scripts:
-- `[ValidateNotNullOrEmpty()]` for mandatory strings
-- `[ValidateScript()]` for path validation
-- `[ValidateSet()]` where applicable
 
 ---
 

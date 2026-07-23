@@ -62,14 +62,14 @@ function Write-Step {
     Write-Host "`n==> $Message" -ForegroundColor Cyan
 }
 
+function Write-Fail {
+    param([string]$Message)
+    Write-Error "   [FAIL] $Message"
+}
+
 function Write-Ok {
     param([string]$Message)
     Write-Host "    [OK] $Message" -ForegroundColor Green
-}
-
-function Write-Fail {
-    param([string]$Message)
-    Write-Host "    [FAIL] $Message" -ForegroundColor Red
 }
 
 function Test-IsAdmin {
@@ -251,6 +251,7 @@ if ($checksPassed) {
     if ($lockedFiles.Count -gt 0) {
         Write-Fail "Found $($lockedFiles.Count) file(s) currently locked by other processes."
         Write-Host "    Locked files:" -ForegroundColor Yellow
+        $checksPassed = $false
         
         # Show first 10 to avoid flooding the console
         $displayCount = [Math]::Min($lockedFiles.Count, 10)
@@ -262,7 +263,6 @@ if ($checksPassed) {
         }
         
         Write-Host "    -> Please close the applications using these files and try again." -ForegroundColor Yellow
-        $checksPassed = $false
     } else {
         Write-Ok "No locked files detected in source folder."
     }
@@ -300,9 +300,7 @@ if ($PSCmdlet.ShouldProcess($effectiveDestination, "Copy from $SourcePath")) {
         Copy-Item -LiteralPath $SourcePath -Destination $effectiveDestination -Recurse -Force -ErrorAction Stop
         Write-Ok "Copy completed: $effectiveDestination"
     } catch {
-        Write-Fail "Copy failed: $($_.Exception.Message)"
-        Write-Error "Copy failed: $($_.Exception.Message)"
-        throw
+        throw "Copy failed: $($_.Exception.Message)"
     }
 
     # Verify copy integrity by comparing file counts and total size
@@ -311,12 +309,10 @@ if ($PSCmdlet.ShouldProcess($effectiveDestination, "Copy from $SourcePath")) {
     $dstSize  = Get-FolderSizeBytes -Path $effectiveDestination
 
     if ($srcCount -ne $dstCount) {
-        Write-Fail "Item count mismatch after copy (source: $srcCount, destination: $dstCount). Aborting before delete."
-        throw
+        throw "Item count mismatch after copy (source: $srcCount, destination: $dstCount). Aborting before delete."
     }
     if ($dstSize -lt $sourceSize) {
-        Write-Fail "Size mismatch after copy (source: $(Format-Bytes $sourceSize), destination: $(Format-Bytes $dstSize)). Aborting before delete."
-        throw
+        throw "Size mismatch after copy (source: $(Format-Bytes $sourceSize), destination: $(Format-Bytes $dstSize)). Aborting before delete."
     }
     Write-Ok "Copy verified (item count and size match)."
 }
@@ -332,7 +328,6 @@ if ($PSCmdlet.ShouldProcess($SourcePath, "Remove original folder")) {
     } catch {
         Write-Fail "Failed to remove original folder: $($_.Exception.Message)"
         Write-Host "    The copy at $effectiveDestination is intact; no symlink was created." -ForegroundColor Yellow
-        Write-Error "Failed to remove original folder: $($_.Exception.Message)"
         throw
     }
 }
@@ -347,9 +342,8 @@ if ($PSCmdlet.ShouldProcess($SourcePath, "Create symbolic link -> $effectiveDest
         Write-Ok "Symbolic link created: $SourcePath -> $effectiveDestination"
     } catch {
         Write-Fail "Failed to create symbolic link: $($_.Exception.Message)"
-        Write-Host "    WARNING: original folder was already deleted. Data is safe at $effectiveDestination" -ForegroundColor Yellow
-        Write-Host "    Re-run manually: New-Item -ItemType SymbolicLink -Path '$SourcePath' -Target '$effectiveDestination'" -ForegroundColor Yellow
-        Write-Error "Failed to create symbolic link: $($_.Exception.Message)"
+        Write-Warning "    WARNING: original folder was already deleted. Data is safe at $effectiveDestination" -ForegroundColor Yellow
+        Write-Warning "    Re-run manually: New-Item -ItemType SymbolicLink -Path '$SourcePath' -Target '$effectiveDestination'" -ForegroundColor Yellow
         throw
     }
 }
