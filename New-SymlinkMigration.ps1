@@ -47,9 +47,12 @@
 [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'High')]
 param(
     [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({Test-Path $_ -PathType Container})]
     [string]$SourcePath,
 
     [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
     [string]$DestinationPath,
 
     [switch]$Force

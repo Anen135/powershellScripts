@@ -58,9 +58,13 @@
 #>
 
 param(
+    [ValidateNotNullOrEmpty()]
     [string]$Path = ".\TrashFolder",
+    [ValidateRange(1, [int]::MaxValue)]
     [int]$FoldersCount = 50,
+    [ValidateRange(1, [int]::MaxValue)]
     [int]$FilesPerFolder = 100,
+    [ValidateRange(1, [int]::MaxValue)]
     [int]$MaxFileSizeKB = 512,
     [switch]$Recreate
 )

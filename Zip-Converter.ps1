@@ -30,20 +30,15 @@
 function Convert-ZipToRar {
     param(
         [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [ValidateScript({Test-Path $_})]
         [string]$ZipFile,
 
+        [ValidateScript({Test-Path $_})]
         [string]$WinRAR = "${env:ProgramFiles}\WinRAR\WinRAR.exe",
 
         [string]$OutputFile
     )
-
-    if (-not (Test-Path $ZipFile)) {
-        throw "File not found: $ZipFile"
-    }
-
-    if (-not (Test-Path $WinRAR)) {
-        throw "WinRAR not found: $WinRAR"
-    }
 
     if (-not $OutputFile) {
         $OutputFile = [System.IO.Path]::ChangeExtension($ZipFile, ".rar")

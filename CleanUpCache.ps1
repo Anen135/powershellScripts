@@ -31,18 +31,10 @@
     Author: Anen
 #>
 param(
+    [ValidateScript({Test-Path $_})]
     [string]$PathsFile = "C:\Program Files\WindowsPowerShell\Scripts\cache.txt", 
     [switch]$WhatIf                   
 )
-
-try {
-    if (-not (Test-Path $PathsFile)) {
-        throw "Path list file not found: $PathsFile"
-    }
-} catch {
-    Write-Error "Error: $($_.Exception.Message)"
-    throw
-}
 
 $PathsFileDir = Split-Path -Parent $PathsFile
 $paths = Get-Content $PathsFile | ForEach-Object { $_.Trim().Trim('"') } | Where-Object { $_ -ne "" -and -not $_.StartsWith("#") }

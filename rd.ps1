@@ -38,10 +38,12 @@
 
 param (
     [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
     [ValidateScript({ Test-Path $_ -PathType Container })]
     [string]$Source,
 
     [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
     [string]$Destination,
 
     [switch]$DryRun,
@@ -58,23 +60,15 @@ function Write-Log {
     }
 }
 
-function Resolve-Path {
+function Get-NormalizedPath {
     param([string]$Path)
     $full = [System.IO.Path]::GetFullPath($Path)
     if ($full.Length -gt 3) { $full = $full.TrimEnd('\') }
     $full
 }
 
-try {
-    $Source = Resolve-Path $Source
-    if (-not (Test-Path $Source -PathType Container)) {
-        throw "Source path does not exist or is not a directory: $Source"
-    }
-}
-catch {
-    throw "Invalid path provided: $_"
-}
-$Destination = Resolve-Path $Destination
+$Source = Get-NormalizedPath $Source
+$Destination = Get-NormalizedPath $Destination
 
 $LogFile = Join-Path $env:TEMP "robomove_$(Get-Date -Format yyyyMMdd_HHmmss).log"
 

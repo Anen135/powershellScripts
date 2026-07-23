@@ -23,6 +23,7 @@
 
 function Optimize-MP4 {
     param(
+        [ValidateNotNullOrEmpty()]
         [string]$OutputDir = "cleaned"
     )
 

@@ -58,6 +58,7 @@
 function touch {
     param(
         [Parameter(Mandatory = $true, Position = 0)]
+        [ValidateNotNullOrEmpty()]
         [string[]]$Path,
 
         [datetime]$ReferenceTime = (Get-Date),

@@ -23,13 +23,10 @@
 
 param(
     [Parameter(Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
+    [ValidateScript({Test-Path $_})]
     [string]$InputFile
 )
-
-if (!(Test-Path $InputFile)) {
-    Write-Error "File not found: $InputFile"
-    throw
-}
 
 if (!(Get-Command ffprobe -ErrorAction SilentlyContinue)) {
     Write-Error "ffprobe not found."

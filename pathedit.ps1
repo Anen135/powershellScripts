@@ -27,7 +27,11 @@
     Version: 1.0
     Author: Anen
 #>
-param( [switch]$Current, [string]$Find)
+param(
+    [switch]$Current,
+    [ValidateNotNullOrEmpty()]
+    [string]$Find
+)
 if ($Current) {
     $currentPath = (Get-Location).Path
 

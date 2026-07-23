@@ -135,7 +135,7 @@ Scripts to fix:
 - `Get-CurrentWifiPassword.ps1` — currently: `Version: 2.3` ✅ Already correct
 - `Get-DirectorySize.ps1` — has `License: MIT` line ✅ Removed 
 
-### 10. ⚪ Review Function Naming
+### 10. 🟢 Review Function Naming
 **Standard:** `Verb-Noun` PascalCase
 
 Scripts to review:

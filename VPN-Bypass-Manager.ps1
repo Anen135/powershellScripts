@@ -53,6 +53,7 @@ param(
 
     [Parameter(ParameterSetName='AddSet', Mandatory=$true)]
     [Parameter(ParameterSetName='RemoveSet', Mandatory=$true)]
+    [ValidateNotNullOrEmpty()]
     [string]$Target
 )
 
