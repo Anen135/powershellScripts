@@ -96,7 +96,8 @@ function New-JunkFile {
     try {
         [IO.File]::WriteAllBytes($FilePath, $bytes)
     } catch {
-        Write-Warning "Failed to create file: $FilePath ($_)"
+        Write-Error "Failed to create file: $FilePath ($($_.Exception.Message))"
+        throw
     }
 }
 
@@ -117,29 +118,34 @@ function New-FilesInFolder {
     }
 }
 
-# Files in root folder
-Write-Host "Creating $FilesPerFolder files in the root folder..."
-New-FilesInFolder -FolderPath $Path -Count $FilesPerFolder -Activity "Root folder"
+try {
+    # Files in root folder
+    Write-Host "Creating $FilesPerFolder files in the root folder..."
+    New-FilesInFolder -FolderPath $Path -Count $FilesPerFolder -Activity "Root folder"
 
-# Subfolders
-Write-Host "Creating $FoldersCount subfolders with $FilesPerFolder files each..."
-for ($f = 1; $f -le $FoldersCount; $f++) {
-    $subPath = Join-Path $Path "subfolder_$f"
-    if (-not (Test-Path $subPath)) {
-        New-Item -ItemType Directory -Path $subPath -Force | Out-Null
+    # Subfolders
+    Write-Host "Creating $FoldersCount subfolders with $FilesPerFolder files each..."
+    for ($f = 1; $f -le $FoldersCount; $f++) {
+        $subPath = Join-Path $Path "subfolder_$f"
+        if (-not (Test-Path $subPath)) {
+            New-Item -ItemType Directory -Path $subPath -Force | Out-Null
+        }
+        New-FilesInFolder -FolderPath $subPath -Count $FilesPerFolder -Activity "Subfolder $f"
+        Write-Progress -Activity "Creating subfolders" -Status "$f of $FoldersCount" -PercentComplete ($f / $FoldersCount * 100)
     }
-    New-FilesInFolder -FolderPath $subPath -Count $FilesPerFolder -Activity "Subfolder $f"
-    Write-Progress -Activity "Creating subfolders" -Status "$f of $FoldersCount" -PercentComplete ($f / $FoldersCount * 100)
+
+    # Statistics
+    $totalFolders = $FoldersCount + 1
+    $totalNewFiles = $totalFolders * $FilesPerFolder
+    $avgFileSizeKB = $MaxFileSizeKB / 2
+    $approxMB = [math]::Round(($totalNewFiles * $avgFileSizeKB) / 1024, 2)
+
+    Write-Host "Done!" -ForegroundColor Green
+    Write-Host "Path: $Path"
+    Write-Host "Added subfolders: $FoldersCount"
+    Write-Host "Added files: $totalNewFiles"
+    Write-Host "Approximate size of added data: ~$approxMB MB"
+} catch {
+    Write-Error "Error creating trash folder: $($_.Exception.Message)"
+    throw
 }
-
-# Statistics
-$totalFolders = $FoldersCount + 1
-$totalNewFiles = $totalFolders * $FilesPerFolder
-$avgFileSizeKB = $MaxFileSizeKB / 2
-$approxMB = [math]::Round(($totalNewFiles * $avgFileSizeKB) / 1024, 2)
-
-Write-Host "Done!" -ForegroundColor Green
-Write-Host "Path: $Path"
-Write-Host "Added subfolders: $FoldersCount"
-Write-Host "Added files: $totalNewFiles"
-Write-Host "Approximate size of added data: ~$approxMB MB"

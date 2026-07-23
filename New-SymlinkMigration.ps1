@@ -270,7 +270,7 @@ if ($checksPassed) {
 
 if (-not $checksPassed) {
     Write-Host "`nPre-flight checks failed. Aborting, no changes were made." -ForegroundColor Red
-    exit 1
+    throw
 }
 
 Write-Ok "All security checks passed."
@@ -301,7 +301,8 @@ if ($PSCmdlet.ShouldProcess($effectiveDestination, "Copy from $SourcePath")) {
         Write-Ok "Copy completed: $effectiveDestination"
     } catch {
         Write-Fail "Copy failed: $($_.Exception.Message)"
-        exit 1
+        Write-Error "Copy failed: $($_.Exception.Message)"
+        throw
     }
 
     # Verify copy integrity by comparing file counts and total size
@@ -311,11 +312,11 @@ if ($PSCmdlet.ShouldProcess($effectiveDestination, "Copy from $SourcePath")) {
 
     if ($srcCount -ne $dstCount) {
         Write-Fail "Item count mismatch after copy (source: $srcCount, destination: $dstCount). Aborting before delete."
-        exit 1
+        throw
     }
     if ($dstSize -lt $sourceSize) {
         Write-Fail "Size mismatch after copy (source: $(Format-Bytes $sourceSize), destination: $(Format-Bytes $dstSize)). Aborting before delete."
-        exit 1
+        throw
     }
     Write-Ok "Copy verified (item count and size match)."
 }
@@ -331,7 +332,8 @@ if ($PSCmdlet.ShouldProcess($SourcePath, "Remove original folder")) {
     } catch {
         Write-Fail "Failed to remove original folder: $($_.Exception.Message)"
         Write-Host "    The copy at $effectiveDestination is intact; no symlink was created." -ForegroundColor Yellow
-        exit 1
+        Write-Error "Failed to remove original folder: $($_.Exception.Message)"
+        throw
     }
 }
 
@@ -347,7 +349,8 @@ if ($PSCmdlet.ShouldProcess($SourcePath, "Create symbolic link -> $effectiveDest
         Write-Fail "Failed to create symbolic link: $($_.Exception.Message)"
         Write-Host "    WARNING: original folder was already deleted. Data is safe at $effectiveDestination" -ForegroundColor Yellow
         Write-Host "    Re-run manually: New-Item -ItemType SymbolicLink -Path '$SourcePath' -Target '$effectiveDestination'" -ForegroundColor Yellow
-        exit 1
+        Write-Error "Failed to create symbolic link: $($_.Exception.Message)"
+        throw
     }
 }
 

@@ -51,7 +51,7 @@ if ($Current) {
     }
     else {
         Write-Host "NOT FOUND: Path '$searhPath' is NOT in PATH." -ForegroundColor Red
-        exit 1
+        throw
     }
     return
  }
@@ -164,89 +164,94 @@ function Show-UI {
 [Console]::Clear()
 $running = $true
 
-while ($running) {
-    Show-UI -paths $paths -selectedIndex $selectedIndex -message $message
-    $message = $null
+try {
+    while ($running) {
+        Show-UI -paths $paths -selectedIndex $selectedIndex -message $message
+        $message = $null
 
-    $key = [Console]::ReadKey($true)
+        $key = [Console]::ReadKey($true)
 
-    switch ($key.Key) {
-        'DownArrow' {
-            $selectedIndex = ($selectedIndex + 1) % $paths.Length
-        }
-        'UpArrow' {
-            $selectedIndex = if ($selectedIndex -le 0) { $paths.Length - 1 } else { $selectedIndex - 1 }
-        }
+        switch ($key.Key) {
+            'DownArrow' {
+                $selectedIndex = ($selectedIndex + 1) % $paths.Length
+            }
+            'UpArrow' {
+                $selectedIndex = if ($selectedIndex -le 0) { $paths.Length - 1 } else { $selectedIndex - 1 }
+            }
 
-        'Enter' {
-            if ($selectedIndex -ge $paths.Length) { continue }
-            $currentValue = $paths[$selectedIndex]
-            $layout = Get-UILayout
+            'Enter' {
+                if ($selectedIndex -ge $paths.Length) { continue }
+                $currentValue = $paths[$selectedIndex]
+                $layout = Get-UILayout
 
-            # Show editing lines
-            Clear-Line $layout.EditLabelLine
-            [Console]::SetCursorPosition(0, $layout.EditLabelLine)
-            Write-Host "Editing: [$selectedIndex] $currentValue" -ForegroundColor Cyan
+                # Show editing lines
+                Clear-Line $layout.EditLabelLine
+                [Console]::SetCursorPosition(0, $layout.EditLabelLine)
+                Write-Host "Editing: [$selectedIndex] $currentValue" -ForegroundColor Cyan
 
-            Clear-Line $layout.EditInputLine
-            [Console]::SetCursorPosition(0, $layout.EditInputLine)
-            Write-Host "New value (empty = keep current): " -ForegroundColor Cyan -NoNewline
+                Clear-Line $layout.EditInputLine
+                [Console]::SetCursorPosition(0, $layout.EditInputLine)
+                Write-Host "New value (empty = keep current): " -ForegroundColor Cyan -NoNewline
 
-            [Console]::CursorVisible = $true
-            $newValue = Read-Host
-            [Console]::CursorVisible = $false
+                [Console]::CursorVisible = $true
+                $newValue = Read-Host
+                [Console]::CursorVisible = $false
 
-            # Immediately clear editing lines
-            Clear-Line $layout.EditLabelLine
-            Clear-Line $layout.EditInputLine
+                # Immediately clear editing lines
+                Clear-Line $layout.EditLabelLine
+                Clear-Line $layout.EditInputLine
 
-            if ([string]::IsNullOrWhiteSpace($newValue)) {
-                $message = "No changes made."
-            } else {
-                $paths[$selectedIndex] = $newValue.Trim()
-                if ($selectedIndex -eq $paths.Length - 1) {
-                    $paths += ""
+                if ([string]::IsNullOrWhiteSpace($newValue)) {
+                    $message = "No changes made."
+                } else {
+                    $paths[$selectedIndex] = $newValue.Trim()
+                    if ($selectedIndex -eq $paths.Length - 1) {
+                        $paths += ""
+                    }
+                    $message = "Entry updated."
                 }
-                $message = "Entry updated."
-            }
-        }
-
-        'S' {
-            $cleanPaths = $paths | Where-Object { $_ -and $_.Trim() }
-            [Environment]::SetEnvironmentVariable("Path", ($cleanPaths -join ';'), "User")
-            $env:Path = [Environment]::GetEnvironmentVariable("Path", "User")
-            $message = "PATH saved successfully (User scope). Restart apps or logoff to apply."
-        }
-
-        'Delete' {
-            if ($selectedIndex -ge $paths.Length -or [string]::IsNullOrWhiteSpace($paths[$selectedIndex])) {
-                $message = "Nothing to delete."
-                continue
             }
 
-            $layout = Get-UILayout
-            Clear-Line $layout.MessageLine
-            [Console]::SetCursorPosition(0, $layout.MessageLine)
-            Write-Host "Press DELETE again to confirm removal of entry [$selectedIndex]" -ForegroundColor Red
-
-            $confirm = [Console]::ReadKey($true)
-
-            if ($confirm.Key -eq 'Delete') {
-                $list = [System.Collections.ArrayList]$paths
-                $list.RemoveAt($selectedIndex)
-                $paths = $list.ToArray()
-                if ($paths.Length -eq 0 -or $paths[-1] -ne "") { $paths += "" }
-                $selectedIndex = [Math]::Min($selectedIndex, $paths.Length - 1)
-                $message = "Entry removed."
-            } else {
-                $message = "Deletion cancelled."
+            'S' {
+                $cleanPaths = $paths | Where-Object { $_ -and $_.Trim() }
+                [Environment]::SetEnvironmentVariable("Path", ($cleanPaths -join ';'), "User")
+                $env:Path = [Environment]::GetEnvironmentVariable("Path", "User")
+                $message = "PATH saved successfully (User scope). Restart apps or logoff to apply."
             }
-        }
 
-        'Escape' {
-            $running = $false
+            'Delete' {
+                if ($selectedIndex -ge $paths.Length -or [string]::IsNullOrWhiteSpace($paths[$selectedIndex])) {
+                    $message = "Nothing to delete."
+                    continue
+                }
+
+                $layout = Get-UILayout
+                Clear-Line $layout.MessageLine
+                [Console]::SetCursorPosition(0, $layout.MessageLine)
+                Write-Host "Press DELETE again to confirm removal of entry [$selectedIndex]" -ForegroundColor Red
+
+                $confirm = [Console]::ReadKey($true)
+
+                if ($confirm.Key -eq 'Delete') {
+                    $list = [System.Collections.ArrayList]$paths
+                    $list.RemoveAt($selectedIndex)
+                    $paths = $list.ToArray()
+                    if ($paths.Length -eq 0 -or $paths[-1] -ne "") { $paths += "" }
+                    $selectedIndex = [Math]::Min($selectedIndex, $paths.Length - 1)
+                    $message = "Entry removed."
+                } else {
+                    $message = "Deletion cancelled."
+                }
+            }
+
+            'Escape' {
+                $running = $false
+            }
         }
     }
+} catch {
+    Write-Error "An unexpected error occurred: $($_.Exception.Message)"
+    throw
 }
 
 [Console]::Clear()

@@ -40,12 +40,12 @@ begin {
 
     if (-not (Test-Command "git")) {
         Write-Error "Git is not installed or not available in PATH."
-        exit 1
+        throw
     }
 
     if (-not (Test-Command "gh")) {
         Write-Error "GitHub CLI (gh) is not installed or not available in PATH."
-        exit 1
+        throw
     }
 
     # Determine visibility flag
@@ -92,7 +92,7 @@ process {
     }
     catch {
         Write-Error "Execution error: $($_.Exception.Message)"
-        exit 1
+        throw
     }
 }
 

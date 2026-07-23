@@ -81,7 +81,7 @@ begin {
     }
     catch {
         Write-Error "Initialization error: $($_.Exception.Message)"
-        exit 1
+        throw
     }
 }
 
@@ -136,7 +136,7 @@ process {
     }
     catch {
         Write-Error "Processing error: $($_.Exception.Message)"
-        exit 1
+        throw
     }
 }
 

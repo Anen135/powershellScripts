@@ -29,49 +29,53 @@ function Optimize-MP4 {
     $InputDir = Get-Location
     $OutputPath = Join-Path $InputDir $OutputDir
 
-    # Create destination folder
-    if (!(Test-Path $OutputPath)) {
-        New-Item -ItemType Directory -Path $OutputPath | Out-Null
-    }
-
-    # Find MP4 files
-    $files = Get-ChildItem -Path $InputDir -Filter "*.mp4" -File
-
-    if ($files.Count -eq 0) {
-        Write-Host "No MP4 files found." -ForegroundColor Yellow
-        return
-    }
-
-    foreach ($file in $files) {
-
-        $destination = Join-Path $OutputPath $file.Name
-
-        Write-Host ""
-        Write-Host "Processing: $($file.Name)" -ForegroundColor Cyan
-
-        if (Test-Path $destination) {
-            Write-Host "Skipping (already exists): $destination" -ForegroundColor Yellow
-            continue
+    try {
+        # Create destination folder
+        if (!(Test-Path $OutputPath)) {
+            New-Item -ItemType Directory -Path $OutputPath | Out-Null
         }
 
-        & ffmpeg `
-            -hide_banner `
-            -loglevel warning `
-            -i $file.FullName `
-            -map 0 `
-            -c copy `
-            -map_metadata -1 `
-            -movflags +faststart `
-            $destination
+        # Find MP4 files
+        $files = Get-ChildItem -Path $InputDir -Filter "*.mp4" -File
 
-        if ($LASTEXITCODE -eq 0) {
+        if ($files.Count -eq 0) {
+            Write-Host "No MP4 files found." -ForegroundColor Yellow
+            return
+        }
+
+        foreach ($file in $files) {
+
+            $destination = Join-Path $OutputPath $file.Name
+
+            Write-Host ""
+            Write-Host "Processing: $($file.Name)" -ForegroundColor Cyan
+
+            if (Test-Path $destination) {
+                Write-Host "Skipping (already exists): $destination" -ForegroundColor Yellow
+                continue
+            }
+
+            & ffmpeg `
+                -hide_banner `
+                -loglevel warning `
+                -i $file.FullName `
+                -map 0 `
+                -c copy `
+                -map_metadata -1 `
+                -movflags +faststart `
+                $destination
+
+            if ($LASTEXITCODE -ne 0) {
+                throw "ffmpeg exited with code $LASTEXITCODE for file: $($file.Name)"
+            }
+
             Write-Host "Done: $destination" -ForegroundColor Green
         }
-        else {
-            Write-Host "Error: $($file.Name)" -ForegroundColor Red
-        }
-    }
 
-    Write-Host ""
-    Write-Host "Cleanup completed." -ForegroundColor Green
+        Write-Host ""
+        Write-Host "Cleanup completed." -ForegroundColor Green
+    } catch {
+        Write-Error "Error: $($_.Exception.Message)"
+        throw
+    }
 }

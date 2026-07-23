@@ -28,12 +28,12 @@ param(
 
 if (!(Test-Path $InputFile)) {
     Write-Error "File not found: $InputFile"
-    exit 1
+    throw
 }
 
 if (!(Get-Command ffprobe -ErrorAction SilentlyContinue)) {
     Write-Error "ffprobe not found."
-    exit 1
+    throw
 }
 
 $OutputFile = [System.IO.Path]::ChangeExtension($InputFile, ".analysis.txt")
@@ -48,8 +48,17 @@ function Start-Probe($ProbeArgs, $section) {
 
     $start = Get-Date
 
-    & ffprobe @ProbeArgs 2>> $null |
-        Out-File $OutputFile -Append
+    try {
+        & ffprobe @ProbeArgs 2>> $null |
+            Out-File $OutputFile -Append
+
+        if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $null) {
+            throw "ffprobe exited with code $LASTEXITCODE"
+        }
+    } catch {
+        Write-Error "Error during $section`: $($_.Exception.Message)"
+        throw
+    }
 
     $time = (Get-Date) - $start
 
@@ -67,76 +76,85 @@ Remove-Item $OutputFile -ErrorAction SilentlyContinue
 "======================================" | Out-File $OutputFile -Append
 
 
-Start-Probe @(
-    "-v","error",
-    "-show_entries",
-    "format=filename,format_name,duration,size,bit_rate",
-    "-of",
-    "default=noprint_wrappers=1",
-    $InputFile
-) "General information"
+try {
+    Start-Probe @(
+        "-v","error",
+        "-show_entries",
+        "format=filename,format_name,duration,size,bit_rate",
+        "-of",
+        "default=noprint_wrappers=1",
+        $InputFile
+    ) "General information"
 
 
-Start-Probe @(
-    "-v","error",
-    "-show_entries",
-    "stream=index,codec_type,codec_name,profile,level,width,height,pix_fmt,r_frame_rate,avg_frame_rate,bit_rate,channels,sample_rate",
-    "-of",
-    "default=noprint_wrappers=1",
-    $InputFile
-) "Stream information"
+    Start-Probe @(
+        "-v","error",
+        "-show_entries",
+        "stream=index,codec_type,codec_name,profile,level,width,height,pix_fmt,r_frame_rate,avg_frame_rate,bit_rate,channels,sample_rate",
+        "-of",
+        "default=noprint_wrappers=1",
+        $InputFile
+    ) "Stream information"
 
 
-Start-Probe @(
-    "-v","error",
-    "-select_streams","v:0",
-    "-show_entries","stream",
-    "-of","default=noprint_wrappers=1",
-    $InputFile
-) "Video stream"
+    Start-Probe @(
+        "-v","error",
+        "-select_streams","v:0",
+        "-show_entries","stream",
+        "-of","default=noprint_wrappers=1",
+        $InputFile
+    ) "Video stream"
 
 
-Start-Probe @(
-    "-v","error",
-    "-select_streams","a:0",
-    "-show_entries","stream",
-    "-of","default=noprint_wrappers=1",
-    $InputFile
-) "Audio stream"
+    Start-Probe @(
+        "-v","error",
+        "-select_streams","a:0",
+        "-show_entries","stream",
+        "-of","default=noprint_wrappers=1",
+        $InputFile
+    ) "Audio stream"
 
 
-Step "Counting key frames"
+    Step "Counting key frames"
 
-$start = Get-Date
+    $start = Get-Date
 
-$keyFrames = ffprobe `
-    -select_streams v:0 `
-    -show_frames `
-    -show_entries frame=pict_type `
-    -of csv `
-    $InputFile |
-    Select-String ",I"
+    $keyFrames = ffprobe `
+        -select_streams v:0 `
+        -show_frames `
+        -show_entries frame=pict_type `
+        -of csv `
+        $InputFile |
+        Select-String ",I"
 
-$elapsed = (Get-Date) - $start
+    if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne $null) {
+        throw "ffprobe key frame analysis exited with code $LASTEXITCODE"
+    }
 
-"=== KEY FRAMES ==="                    | Out-File $OutputFile -Append
-"Key frames count: $($keyFrames.Count)" | Out-File $OutputFile -Append
+    $elapsed = (Get-Date) - $start
 
-Write-Host "    Key frames: $($keyFrames.Count)"
-Write-Host "    Time: $([math]::Round($elapsed.TotalSeconds,2)) sec." -ForegroundColor Green
+    "=== KEY FRAMES ==="                    | Out-File $OutputFile -Append
+    "Key frames count: $($keyFrames.Count)" | Out-File $OutputFile -Append
 
-
-Start-Probe @(
-    "-v","error",
-    "-show_entries",
-    "stream=index,codec_type,codec_name",
-    "-of","table",
-    $InputFile
-) "Checking all streams"
+    Write-Host "    Key frames: $($keyFrames.Count)"
+    Write-Host "    Time: $([math]::Round($elapsed.TotalSeconds,2)) sec." -ForegroundColor Green
 
 
-Write-Host ""
-Write-Host "================================="
-Write-Host "Analysis completed" -ForegroundColor Green
-Write-Host "Report file:"
-Write-Host $OutputFile
+    Start-Probe @(
+        "-v","error",
+        "-show_entries",
+        "stream=index,codec_type,codec_name",
+        "-of","table",
+        $InputFile
+    ) "Checking all streams"
+
+
+    Write-Host ""
+    Write-Host "================================="
+    Write-Host "Analysis completed" -ForegroundColor Green
+    Write-Host "Report file:"
+    Write-Host $OutputFile
+} catch {
+    Write-Error "Analysis failed: $($_.Exception.Message)"
+    throw
+}

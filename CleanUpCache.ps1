@@ -35,9 +35,13 @@ param(
     [switch]$WhatIf                   
 )
 
-if (-not (Test-Path $PathsFile)) {
-    Write-Error "Path list file not found: $PathsFile"
-    exit 1
+try {
+    if (-not (Test-Path $PathsFile)) {
+        throw "Path list file not found: $PathsFile"
+    }
+} catch {
+    Write-Error "Error: $($_.Exception.Message)"
+    throw
 }
 
 $PathsFileDir = Split-Path -Parent $PathsFile
@@ -76,7 +80,7 @@ foreach ($rawPath in $paths) {
                         if ($child.PSIsContainer) { $totalFoldersDeleted++ } else { $totalFilesDeleted++ }
                         Write-Host "Deleted: $($child.FullName)" -ForegroundColor Green
                     } catch {
-                        Write-Error "Failed to delete $($child.FullName): $_"
+                        Write-Error "Failed to delete $($child.FullName): $($_.Exception.Message)"
                         $totalErrors++
                         $failedItems += $child.FullName
                     }
@@ -90,13 +94,13 @@ foreach ($rawPath in $paths) {
                 $totalFilesDeleted++
                 Write-Host "File deleted: $path" -ForegroundColor Green
             } catch {
-                Write-Error "Failed to delete file ${path}: $_"
+                Write-Error "Failed to delete file ${path}: $($_.Exception.Message)"
                 $totalErrors++
                 $failedItems += $path
             }
         }
     } catch {
-        Write-Error "Failed to process path ${path}: $_"
+        Write-Error "Failed to process path ${path}: $($_.Exception.Message)"
         $totalErrors++
         $failedItems += $path
     }

@@ -125,10 +125,13 @@ function Send-ApiRequest {
                 } else {
                     Write-Host "Null response from server." -ForegroundColor Red
                 }
-            } catch { }
+            } catch {
+                Write-Error "Failed to read error response: $($_.Exception.Message)"
+            }
         } else {
             Write-Error $_.Exception.Message
         }
+        throw
     }
 }
 

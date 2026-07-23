@@ -59,7 +59,7 @@ param(
 # Check for administrator privileges
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
     Write-Error "This script must be run as an Administrator."
-    exit 1
+    throw
 }
 
 $DefaultGateway = ""  # If empty — auto-detected
@@ -83,7 +83,7 @@ $routeInfo = Get-DefaultRouteInfo
 
 if (-not $routeInfo) {
     Write-Error "Could not determine default route. Check your network connection or specify `$DefaultGateway manually."
-    exit 1
+    throw
 }
 
 if (-not $DefaultGateway) {
@@ -104,7 +104,8 @@ function Add-Bypass {
             New-NetRoute -DestinationPrefix "$Target/32" -NextHop $DefaultGateway -ErrorAction Stop | Out-Null
             Write-Host "Added: $Target" -ForegroundColor Green
         } catch {
-            Write-Error "Error adding $Target : $_"
+            Write-Error "Error adding ${Target}: $($_.Exception.Message)"
+            throw
         }
     }
     else {
@@ -118,7 +119,8 @@ function Add-Bypass {
                         New-NetRoute -DestinationPrefix "$ipStr/32" -NextHop $DefaultGateway -ErrorAction Stop | Out-Null
                         Write-Host "Added: $ipStr <== $Target" -ForegroundColor Green
                     } catch {
-                        Write-Error "Error adding $ipStr : $_"
+                        Write-Error "Error adding ${ipStr}: $($_.Exception.Message)"
+                        throw
                     }
                 }
             } else {
@@ -126,6 +128,7 @@ function Add-Bypass {
             }
         } catch {
             Write-Error "Could not resolve domain: $Target"
+            throw
         }
     }
 }
@@ -146,7 +149,8 @@ function Remove-Bypass {
                 Write-Warning "Route for $Target not found in PersistentStore."
             }
         } catch {
-            Write-Error "Error removing $Target : $_"
+            Write-Error "Error removing ${Target}: $($_.Exception.Message)"
+            throw
         }
     }
     else {
@@ -165,7 +169,8 @@ function Remove-Bypass {
                             Write-Warning "Route for $ipStr not found."
                         }
                     } catch {
-                        Write-Error "Error removing $ipStr : $_"
+                        Write-Error "Error removing ${ipStr}: $($_.Exception.Message)"
+                        throw
                     }
                 }
             } else {
@@ -173,6 +178,7 @@ function Remove-Bypass {
             }
         } catch {
             Write-Error "Could not resolve domain: $Target"
+            throw
         }
     }
 }

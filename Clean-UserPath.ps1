@@ -84,7 +84,7 @@ process {
     }
     catch {
         Write-Error "Error updating PATH: $($_.Exception.Message)"
-        exit 1
+        throw
     }
 }
 

@@ -140,7 +140,7 @@ Scripts needing review:
 - Analyze-MP4.ps1 — uses `Write-Host` for all output
 
 ### 8. 🟡 Align Error Handling
-**Standard:** `try/catch` → `Write-Error` + `exit 1` for all;
+**Standard:** `try/catch` → `Write-Error` + `throw` for all;
 
 ### 9. ⚪ Normalize Version Format
 **Standard:** `Version: X.Y` (no extra text after the number)

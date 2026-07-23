@@ -101,6 +101,7 @@ function touch {
         }
     }
     catch {
-        Write-Error "An error occurred while processing the path '$p': $_"
+        Write-Error "An error occurred while processing the path '$p': $($_.Exception.Message)"
+        throw
     }
 }
