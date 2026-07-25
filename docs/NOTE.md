@@ -11,3 +11,4 @@
 11. VPN-Bypass-Manager requires significant improvements. 
 12. It is worth considering the standardization of script names.
 13. Create Tests/ folder
+14. Try-Catch was not the best solution.

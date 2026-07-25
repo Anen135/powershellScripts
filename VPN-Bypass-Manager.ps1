@@ -118,16 +118,14 @@ function Add-Bypass {
                         New-NetRoute -DestinationPrefix "$ipStr/32" -NextHop $DefaultGateway -InterfaceIndex $routeInfo.InterfaceIndex -ErrorAction Stop | Out-Null
                         Write-Host "Added: $ipStr <== $Target" -ForegroundColor Green
                     } catch {
-                        Write-Error "Error adding ${ipStr}: $($_.Exception.Message)"
-                        throw "Error adding ${ipStr}"
+                        throw "Error adding ${ipStr}: $($_.Exception.Message)"
                     }
                 }
             } else {
                 Write-Warning "Domain resolved, but no IPv4 addresses found for: $Target"
             }
         } catch {
-            Write-Error "Could not resolve domain: $Target"
-            throw "Could not resolve domain: $Target"
+            Write-Host "Could not resolve domain: $Target" 
         }
     }
 }
