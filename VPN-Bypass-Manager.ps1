@@ -100,7 +100,7 @@ function Add-Bypass {
 
     if ($isIPv4) {
         try {
-            New-NetRoute -DestinationPrefix "$Target/32" -NextHop $DefaultGateway -ErrorAction Stop | Out-Null
+            New-NetRoute -DestinationPrefix "$Target/32" -NextHop $DefaultGateway -InterfaceIndex $routeInfo.InterfaceIndex -ErrorAction Stop | Out-Null
             Write-Host "Added: $Target" -ForegroundColor Green
         } catch {
             Write-Error "Error adding ${Target}: $($_.Exception.Message)"
@@ -115,11 +115,11 @@ function Add-Bypass {
                 foreach ($ip in $ips) {
                     $ipStr = $ip.IPAddressToString
                     try {
-                        New-NetRoute -DestinationPrefix "$ipStr/32" -NextHop $DefaultGateway -ErrorAction Stop | Out-Null
+                        New-NetRoute -DestinationPrefix "$ipStr/32" -NextHop $DefaultGateway -InterfaceIndex $routeInfo.InterfaceIndex -ErrorAction Stop | Out-Null
                         Write-Host "Added: $ipStr <== $Target" -ForegroundColor Green
                     } catch {
                         Write-Error "Error adding ${ipStr}: $($_.Exception.Message)"
-                        throw
+                        throw "Error adding ${ipStr}"
                     }
                 }
             } else {
@@ -127,7 +127,7 @@ function Add-Bypass {
             }
         } catch {
             Write-Error "Could not resolve domain: $Target"
-            throw
+            throw "Could not resolve domain: $Target"
         }
     }
 }
