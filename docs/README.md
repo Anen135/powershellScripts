@@ -1,8 +1,19 @@
+PowerShell scripts for:
+- Windows system administration
+- automation
+- developer workflows
+- CLI utilities
+- file management
+- network troubleshooting
+
 # PowerShell Scripts Collection
 
 A collection of useful PowerShell scripts for Windows system administration, file management, development workflows, and daily productivity.
 
-[![GitHub](https://img.shields.io/badge/GitHub-Anen135/powershellScripts-blue?logo=github)](https://github.com/Anen135/powershellScripts)
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1%2B-blue?logo=powershell)
+![Platform](https://img.shields.io/badge/platform-Windows-blue)
+![License](https://img.shields.io/github/license/Anen135/powershellScripts)
+![Stars](https://img.shields.io/github/stars/Anen135/powershellScripts)
 
 ## 📋 Table of Contents
 
@@ -258,7 +269,7 @@ req -Uri "https://api.github.com/repos/Anen135/powershellScripts"
 
 ## License
 
-This project is licensed under the GPL3 License.
+This project is licensed under the GNU General Public License v3.0.
 
 ## Author
 
