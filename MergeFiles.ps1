@@ -1,16 +1,17 @@
 ﻿<#
 .SYNOPSIS
-    Merges all text files from a specified folder into a single file.
+    Merges text files from a specified folder into a single file.
 
 .DESCRIPTION
-    The script reads all text files from the specified folder,
-    adds a delimiter with the filename before the content of each file,
+    The script reads text files from the specified folder,
+    adds a delimiter with the filename/path before the content of each file,
     and writes everything to a single output file.
-    Works only with text files (UTF-8 encoding).
-    
+
+    Supports recursive directory scanning with -Recurse.
+
     Supports filtering:
-    -Filter     : wildcard patterns (*.txt, log_??.csv)
-    -RegexFilter: regular expressions (^report_.*\.txt$)
+    -Filter      : wildcard patterns (*.txt, *.cs, log_??.csv)
+    -RegexFilter : regular expressions (^report_.*\.txt$)
 
 .PARAMETER InputFolder
     Path to the folder containing files to merge.
@@ -19,57 +20,91 @@
     Path to the output file where the result will be written.
 
 .PARAMETER Filter
-    Wildcard pattern for filtering filenames (similar to dir -Filter).
-    Example: "*.txt", "log_??.csv"
+    Wildcard pattern for filtering filenames.
+    Example: "*.txt", "*.cs", "log_??.csv"
 
 .PARAMETER RegexFilter
     Regular expression for filtering filenames.
     Example: "^report_.*\.txt$", "^\d{4}-\d{2}-\d{2}_.*\.log$"
 
+.PARAMETER Recurse
+    Recursively searches all subdirectories inside InputFolder.
+
 .EXAMPLE
     PS> .\Merge-Files.ps1 -InputFolder ".\merger" -OutputFile ".\main.txt"
 
 .EXAMPLE
-    PS> .\Merge-Files.ps1 -InputFolder ".\logs" -Filter "*.log" -OutputFile ".\all_logs.txt"
+    PS> .\Merge-Files.ps1 -InputFolder ".\Project" -Recurse -OutputFile ".\main.txt"
 
 .EXAMPLE
-    PS> .\Merge-Files.ps1 -InputFolder ".\data" -RegexFilter "^2024-.*\.txt$" -OutputFile ".\2024_data.txt"
+    PS> .\Merge-Files.ps1 -InputFolder ".\Project" -Recurse -Filter "*.cs" -OutputFile ".\AllScripts.txt"
+
+.EXAMPLE
+    PS> .\Merge-Files.ps1 -InputFolder ".\data" -Recurse -RegexFilter "^.*\.json$" -OutputFile ".\data.txt"
 
 .NOTES
-    Version: 2.1
+    Version: 3.0
     Author: Anen
 #>
 
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false)]
-    [ValidateScript({Test-Path $_ -PathType Container})]
+    [ValidateScript({ Test-Path $_ -PathType Container })]
     [string]$InputFolder = ".\merger",
 
     [Parameter(Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
     [string]$OutputFile = ".\main.txt",
-    
+
     [Parameter(Mandatory = $false)]
     [string]$Filter,
-    
+
     [Parameter(Mandatory = $false)]
-    [string]$RegexFilter
+    [string]$RegexFilter,
+
+    [Parameter(Mandatory = $false)]
+    [switch]$Recurse
 )
 
 begin {
     Write-Verbose "Initializing parameters..."
+
     try {
         if (-not (Test-Path $InputFolder -PathType Container)) {
             throw "Folder '$InputFolder' does not exist."
         }
 
-        if (Test-Path $OutputFile) {
-            Write-Verbose "Removing existing file '$OutputFile'..."
-            Remove-Item -Path $OutputFile -Force -ErrorAction Stop
+        # Convert paths to absolute paths.
+        $InputFolderFullPath = [System.IO.Path]::GetFullPath(
+            (Resolve-Path $InputFolder).Path
+        )
+
+        $OutputFileFullPath = [System.IO.Path]::GetFullPath(
+            $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputFile)
+        )
+
+        if (Test-Path $OutputFileFullPath) {
+            Write-Verbose "Removing existing file '$OutputFileFullPath'..."
+            Remove-Item -Path $OutputFileFullPath -Force -ErrorAction Stop
         }
-        
-        # Validate regular expression if provided
+
+        # Create output directory if necessary.
+        $OutputDirectory = Split-Path -Parent $OutputFileFullPath
+
+        if (
+            $OutputDirectory -and
+            -not (Test-Path $OutputDirectory -PathType Container)
+        ) {
+            Write-Verbose "Creating output directory '$OutputDirectory'..."
+            New-Item `
+                -ItemType Directory `
+                -Path $OutputDirectory `
+                -Force `
+                -ErrorAction Stop | Out-Null
+        }
+
+        # Validate regular expression.
         if ($RegexFilter) {
             try {
                 $null = [regex]::New($RegexFilter)
@@ -87,44 +122,98 @@ begin {
 
 process {
     try {
-        # Base file query
+        # Build Get-ChildItem parameters.
         $FilesQuery = @{
-            Path = $InputFolder
-            File = $true
+            Path        = $InputFolderFullPath
+            File        = $true
             ErrorAction = 'Stop'
         }
-        
-        # Add -Filter if specified (wildcard patterns only)
+
         if ($Filter) {
             $FilesQuery['Filter'] = $Filter
         }
-        
-        $Files = Get-ChildItem @FilesQuery |
-                 Where-Object { $_.Name -ne [System.IO.Path]::GetFileName($OutputFile) }
-        
-        # Apply regular expression filter if specified
-        if ($RegexFilter) {
-            $Files = $Files | Where-Object { $_.Name -match $RegexFilter }
+
+        if ($Recurse) {
+            $FilesQuery['Recurse'] = $true
         }
 
-        if (-not $Files) {
-            Write-Warning "No files found in folder '$InputFolder' to merge$(
-                if($Filter){" with filter '$Filter'"}
-                if($RegexFilter){" with regex '$RegexFilter'"}
-            )."
+        $Files = Get-ChildItem @FilesQuery |
+
+            # Do not merge the output file into itself.
+            Where-Object {
+                $_.FullName -ne $OutputFileFullPath
+            }
+
+        # Apply regex to file name.
+        if ($RegexFilter) {
+            $Files = $Files |
+                Where-Object {
+                    $_.Name -match $RegexFilter
+                }
+        }
+
+        # Sort for deterministic output.
+        $Files = @(
+            $Files |
+            Sort-Object FullName
+        )
+
+        if ($Files.Count -eq 0) {
+            $FilterInfo = ""
+
+            if ($Filter) {
+                $FilterInfo += " with filter '$Filter'"
+            }
+
+            if ($RegexFilter) {
+                $FilterInfo += " with regex '$RegexFilter'"
+            }
+
+            if ($Recurse) {
+                $FilterInfo += " recursively"
+            }
+
+            Write-Warning "No files found in folder '$InputFolder'$FilterInfo."
             return
         }
 
         foreach ($File in $Files) {
             try {
-                # Delimiter
-                "%%=============$($File.Name)========%%" | Out-File -FilePath $OutputFile -Encoding UTF8 -Append -ErrorAction Stop
+                # Get relative path from the root directory.
+                $RelativePath = [System.IO.Path]::GetRelativePath(
+                    $InputFolderFullPath,
+                    $File.FullName
+                )
 
-                # File content
-                Get-Content -Path $File.FullName -ErrorAction Stop | 
-                    Out-File -FilePath $OutputFile -Encoding UTF8 -Append -ErrorAction Stop
+                # Normalize separators for nicer output.
+                $RelativePath = $RelativePath -replace '\\', '/'
 
-                Write-Verbose "File '$($File.Name)' added."
+                # Delimiter.
+                "%%=============$RelativePath========%%" |
+                    Out-File `
+                        -FilePath $OutputFileFullPath `
+                        -Encoding UTF8 `
+                        -Append `
+                        -ErrorAction Stop
+
+                # File content.
+                Get-Content `
+                    -Path $File.FullName `
+                    -ErrorAction Stop |
+                    Out-File `
+                        -FilePath $OutputFileFullPath `
+                        -Encoding UTF8 `
+                        -Append `
+                        -ErrorAction Stop
+
+                # Empty line between files.
+                "" |
+                    Out-File `
+                        -FilePath $OutputFileFullPath `
+                        -Encoding UTF8 `
+                        -Append
+
+                Write-Verbose "File '$RelativePath' added."
             }
             catch {
                 Write-Warning "Error processing file '$($File.FullName)': $($_.Exception.Message)"
@@ -132,7 +221,7 @@ process {
             }
         }
 
-        Write-Output "All files from '$InputFolder' have been merged into '$OutputFile'."
+        Write-Output "Merged $($Files.Count) files from '$InputFolder' into '$OutputFile'."
     }
     catch {
         Write-Error "Processing error: $($_.Exception.Message)"
