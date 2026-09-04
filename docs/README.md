@@ -196,6 +196,21 @@ Manages persistent network routes to bypass VPN for specific IPs/domains. Uses `
 .\VPN-Bypass-Manager.ps1 -List
 ```
 
+### Init-WinRM.ps1
+Prepares a Windows machine for PowerShell Remoting: disables the blank-password restriction for local accounts, sets all active network profiles to Private, enables PowerShell Remoting, and configures the WinRM service to start automatically. Requires Administrator privileges.
+
+```
+.\Init-WinRM.ps1
+.\Init-WinRM.ps1 -Verbose          # Detailed progress output
+```
+
+### RemoveWinRmLimit.ps1
+Disables the blank-password restriction for local accounts used for remote logon (WinRM). Standalone version of the first step of `Init-WinRM.ps1`. Requires Administrator privileges.
+
+```
+.\RemoveWinRmLimit.ps1
+.\RemoveWinRmLimit.ps1 -Verbose    # Detailed progress output
+```
 ---
 
 ## Getting Started
