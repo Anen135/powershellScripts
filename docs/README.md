@@ -1,4 +1,4 @@
-PowerShell scripts for:
+﻿PowerShell scripts for:
 - Windows system administration
 - automation
 - developer workflows
@@ -76,6 +76,19 @@ Enhanced `DIR` command replacement with rich features:
 
 ```
 .\Get-DirectorySize.ps1 -Path "C:\Temp" -Unit GB -Sort S -Recurse
+```
+### Set-KeyboardState.ps1
+Disables or re-enables keyboard input on the local machine. Disarms the PS/2
+(`i8042prt`) and USB/HID (`kbdhid`) keyboard kernel drivers (persistent, effective after
+reboot) or the connected keyboard PnP devices immediately. Requires Administrator
+privileges.
+
+```powershell
+.\Set-KeyboardState.ps1                      # Disable keyboard drivers (after reboot)
+.\Set-KeyboardState.ps1 -Driver kbdhid       # Disable only the USB/HID keyboard driver
+.\Set-KeyboardState.ps1 -Devices             # Disable keyboard devices immediately
+.\Set-KeyboardState.ps1 -Enable              # Restore keyboard input
+.\Set-KeyboardState.ps1 -List                # Show current status
 ```
 
 ---
