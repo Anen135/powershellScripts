@@ -1,10 +1,37 @@
-# Changelog
+﻿# Changelog
 
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-09
+
+### Fixed
+- `Get-CurrentWifiPassword.ps1`: Wi-Fi password was not extracted on Russian
+  (CP866) systems even though `netsh` reported `Key Content` correctly.
+  Root cause: capturing `netsh` output directly through the PowerShell pipeline
+  mis-decoded Cyrillic (single-box characters), so the regex never matched.
+  Fix: output is now captured via `chcp 65001` into a temp file and read back as
+  UTF-8; the password label is matched as `Key Content` (ASCII) with a Russian
+  fallback. Verified: `Cat_Wi-Fi` → `Password: 2244668800`.
+
+## [1.3.0] - 2026-09-06
+
+### Changed
+- `disable-keyboard.ps1` renamed to `Set-KeyboardState.ps1` and rewritten into
+  a full-featured utility:
+  - Added comment-based help block and `#Requires -RunAsAdministrator`
+  - Now disables both keyboard kernel drivers (`i8042prt` — PS/2 and
+    `kbdhid` — USB/HID), not only `i8042prt`
+  - New parameters: `-Driver` (driver selection), `-Devices` (immediate PnP
+    device mode), `-Enable` (restore), `-List` (status view)
+  - Original driver startup values are persisted to a JSON state file
+    (`%ProgramData%\Set-KeyboardState\state.json`) so `-Enable` restores them
+    exactly
+  - Supports `-Verbose`, `-WhatIf`, `-Confirm`
+  - Standard error handling (`try/catch` + `Write-Error` + `throw`) and
+    English-only output
 ## [1.2.0] - 2026-09-04
 
 ### Added
