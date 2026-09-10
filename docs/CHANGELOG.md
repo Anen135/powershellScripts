@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-09-09
+
+### Fixed
+- `Get-CurrentWifiPassword.ps1`: Wi-Fi password was not extracted on Russian
+  (CP866) systems even though `netsh` reported `Key Content` correctly.
+  Root cause: capturing `netsh` output directly through the PowerShell pipeline
+  mis-decoded Cyrillic (single-box characters), so the regex never matched.
+  Fix: output is now captured via `chcp 65001` into a temp file and read back as
+  UTF-8; the password label is matched as `Key Content` (ASCII) with a Russian
+  fallback. Verified: `Cat_Wi-Fi` → `Password: 2244668800`.
+
 ## [1.3.0] - 2026-09-06
 
 ### Changed
