@@ -7,6 +7,8 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $managerPath = Join-Path $root 'WinRM.Manager.psd1'
 $toolsPath = Join-Path $root 'WinRM.Tools.psm1'
+$addonsModulePath = Join-Path $root 'WinRM.Addons.psm1'
+$bundledAddonsPath = Join-Path $root 'addons'
 $tuiPath = Join-Path $root 'Start-WinRMTui.ps1'
 
 function Assert-True {
@@ -14,7 +16,7 @@ function Assert-True {
     if (-not $Condition) { throw "FAIL: $Message" }
 }
 
-foreach ($file in @($managerPath, (Join-Path $root 'WinRM.Manager.psm1'), $toolsPath, $tuiPath)) {
+foreach ($file in @($managerPath, (Join-Path $root 'WinRM.Manager.psm1'), $toolsPath, $addonsModulePath, $tuiPath, (Join-Path $bundledAddonsPath 'DomainWatch\DomainWatch.psm1'))) {
     $tokens = $null; $errors = $null
     $null = [Management.Automation.Language.Parser]::ParseFile($file, [ref]$tokens, [ref]$errors)
     Assert-True ($errors.Count -eq 0) "Parse $file : $errors"
@@ -25,8 +27,13 @@ Assert-True ($tuiSource -match 'function Invoke-TuiRemoteCommandShell') 'Persist
 Assert-True ($tuiSource -match 'Out-String -Stream -Width') 'Remote command output is formatted before serialization'
 Assert-True ($tuiSource -match 'OEMCodePage') 'Remote native command encoding is initialized'
 Assert-True ($tuiSource -match '\$qualifiedUser = "\$computerQualifier\\\$login"') 'Single-host login is qualified with the computed computer name'
+Assert-True ($tuiSource -match 'Computer name required' -and $tuiSource -match 'ComputerNameProvided') 'Unresolved IP requests and persists a computer name before login'
 Assert-True ($tuiSource -notmatch 'Get-TuiConfiguredUser|EditDefault') 'Saved default credential workflow is absent'
 Assert-True ($tuiSource -match "'NAME', 'ADDRESS'") 'Host table displays computer name and address columns'
+Assert-True ($tuiSource -match "'Tab' \{") 'Root TUI exposes tab navigation'
+Assert-True ($tuiSource -notmatch 'Show-TuiAddonMenu') 'Separate add-on selection menu is absent'
+Assert-True ($tuiSource -match 'Get-TuiTabText') 'Root and add-ons receive a shared top tab bar'
+Assert-True ($tuiSource -match '\$addonStates = @\{\}' -and $tuiSource -match 'function Stop-TuiAddons') 'Add-on state survives tabs and is disposed on application exit'
 
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) ('WinRMTui-tests-' + [guid]::NewGuid().ToString('N'))
 $null = [IO.Directory]::CreateDirectory($testRoot)
@@ -37,7 +44,7 @@ try {
     Assert-True ((ConvertTo-WinRMDiscoveryPattern '192.168.3.20/24') -eq '192.168.3.*') 'Wireless profile becomes local /24 wildcard'
     Assert-True ((ConvertTo-WinRMDiscoveryPattern '192.168.*.*') -eq '192.168.*.*') 'Broader custom wildcard is preserved'
     $store = Initialize-WinRMStore -StorePath $testRoot
-    Assert-True ((Test-Path $store.Config) -and (Test-Path $store.Inventory) -and (Test-Path $store.Scripts)) 'Store initialized'
+    Assert-True ((Test-Path $store.Config) -and (Test-Path $store.Inventory) -and (Test-Path $store.Scripts) -and (Test-Path $store.Addons)) 'Store initialized'
     $config = Get-WinRMManagerConfig -StorePath $testRoot
     Assert-True ($config.SchemaVersion -eq 1 -and $config.Settings.ThrottleLimit -gt 0) 'Default config'
     $config.Settings | Add-Member -NotePropertyName DefaultUser -NotePropertyValue 'WORKGROUP\FixtureUser'
@@ -76,7 +83,25 @@ try {
     Assert-True ($events.Count -eq 1 -and $events[0].Data.Value -eq 42) 'JSONL audit'
 
     Import-Module $toolsPath -Force
+    Import-Module $addonsModulePath -Force
+    $addons = @(Get-WinRMAddon -Root @($bundledAddonsPath, $store.Addons) -HostVersion '1.0.0')
+    $domainWatch = @($addons | Where-Object Id -eq 'domain-watch')
+    Assert-True ($domainWatch.Count -eq 1 -and $domainWatch[0].Status -eq 'Ready') 'Bundled Domain Watch add-on is discovered'
+    $loadedAddon = Import-WinRMAddon -Addon $domainWatch[0]
+    Assert-True ($loadedAddon.Command.Name -eq 'Invoke-DomainWatchAddon') 'Add-on entry command is loaded from its manifest'
+    $domainWatchModule = $loadedAddon.Module
+    $domainWatchSource = Get-Content -LiteralPath (Join-Path $bundledAddonsPath 'DomainWatch\DomainWatch.psm1') -Raw -Encoding UTF8
+    Assert-True ($domainWatchSource -notmatch 'Import-Module \$Context\.ToolsModulePath -Force') 'Domain Watch does not force-reload the root tools module'
+    Assert-True ($domainWatchSource -match "ContainsKey\('Connections'\)" -and $domainWatchSource -match '\$state\.Dispose') 'Domain Watch preserves sessions in host-owned tab state'
+    Assert-True ((& $domainWatchModule { Test-DomainWatchMatch 'www.casino.com' @('casino.com') })) 'Watchlist matches subdomains on a DNS label boundary'
+    Assert-True (-not (& $domainWatchModule { Test-DomainWatchMatch 'notcasino.com' @('casino.com') })) 'Watchlist does not match a partial domain suffix'
+    & $domainWatchModule { param($Path) Import-Module $Path -ErrorAction Stop } $toolsPath
+    Assert-True ($null -ne (Get-Command Resolve-WinRMComputerName -ErrorAction SilentlyContinue)) 'Add-on module import preserves root WinRM tools commands'
+
+    Import-Module $toolsPath -Force
     $tools = Get-Module WinRM.Tools
+    $localResolution = Resolve-WinRMComputerName -Address '127.0.0.1' -TimeoutMs 500
+    Assert-True ($localResolution.ComputerName -eq [Environment]::MachineName -and $localResolution.NameSource -eq 'Local') 'Local IP resolves to the current computer name'
     $netBiosResponse = [byte[]]::new(48)
     $netBiosResponse[5] = 1; $netBiosResponse[7] = 1
     $netBiosResponse[12] = 0; $netBiosResponse[13] = 0; $netBiosResponse[14] = 0x21; $netBiosResponse[15] = 0; $netBiosResponse[16] = 1
@@ -108,10 +133,10 @@ try {
     Assert-True ($transfer.Status -eq 'Succeeded') 'Mocked upload result'
     Assert-True ((& $tools { $null -ne $script:copyCall -and $script:removed })) 'Upload invoked and session removed'
 
-    'PASS: store, merge, preferred endpoints, groups, tags, filters, blacklist, JSON/CSV, audit and file transfer.'
+    'PASS: store, add-ons, Domain Watch, merge, endpoints, filters, JSON/CSV, audit and file transfer.'
 }
 finally {
-    Remove-Module WinRM.Manager, WinRM.Tools -ErrorAction SilentlyContinue
+    Remove-Module WinRM.Manager, WinRM.Tools, WinRM.Addons, DomainWatch -ErrorAction SilentlyContinue
     if (Test-Path -LiteralPath $testRoot) {
         # The target is a unique directory created above under the OS temp path.
         Remove-Item -LiteralPath $testRoot -Recurse -Force

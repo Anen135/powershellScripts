@@ -77,7 +77,7 @@ function Initialize-WinRMStore {
 
     $resolved = [IO.Path]::GetFullPath($ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($StorePath))
     $null = [IO.Directory]::CreateDirectory($resolved)
-    foreach ($directory in @('logs', 'downloads', 'scripts')) {
+    foreach ($directory in @('logs', 'downloads', 'scripts', 'addons')) {
         $null = [IO.Directory]::CreateDirectory((Join-Path $resolved $directory))
     }
     $configPath = Join-Path $resolved 'config.json'
@@ -91,6 +91,7 @@ function Initialize-WinRMStore {
         Audit = Join-Path $resolved 'logs\audit.jsonl'
         Downloads = Join-Path $resolved 'downloads'
         Scripts = Join-Path $resolved 'scripts'
+        Addons = Join-Path $resolved 'addons'
     }
 }
 

@@ -88,6 +88,19 @@ function Resolve-WinRMComputerName {
     $connectionHost = $Address
     $source = 'Address'
     try {
+        $localNames = @([Net.Dns]::GetHostName(), [Environment]::MachineName) | Where-Object { $_ } | Select-Object -Unique
+        $localAddresses = @($localNames | ForEach-Object { [Net.Dns]::GetHostAddresses($_) } | ForEach-Object { $_.IPAddressToString })
+        $parsedLocalCandidate = $null
+        if ($Address -in $localAddresses -or
+            ([Net.IPAddress]::TryParse($Address, [ref]$parsedLocalCandidate) -and [Net.IPAddress]::IsLoopback($parsedLocalCandidate))) {
+            $name = [Environment]::MachineName
+            $connectionHost = $name
+            $source = 'Local'
+            return [pscustomobject]@{ ComputerName = $name; ConnectionHost = $connectionHost; NameSource = $source }
+        }
+    }
+    catch { Write-Verbose "Local address lookup for ${Address}: $($_.Exception.Message)" }
+    try {
         $lookup = [System.Net.Dns]::GetHostEntryAsync($Address)
         if ($lookup.Wait($TimeoutMs)) {
             $name = $lookup.Result.HostName
