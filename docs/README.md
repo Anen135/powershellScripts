@@ -29,6 +29,84 @@ A collection of useful PowerShell scripts for Windows system administration, fil
 
 ## System Utilities
 
+### WinRM Fleet Console
+Full-screen fleet manager with network discovery, persistent inventory,
+groups/tags, filtering, blacklist rules, parallel PowerShell execution,
+interactive sessions, upload/download collection, power actions and JSONL
+audit. Credentials are retained in memory only.
+
+```powershell
+.\WinRM\Start-WinRMTui.ps1
+```
+
+See [`WinRM/README.md`](../WinRM/README.md) for the keyboard map, storage
+layout, filters, security model and non-interactive module API.
+
+### Find-WinRM.ps1
+Find reachable WinRM endpoints using an IPv4 wildcard or CIDR range. Probes HTTP/HTTPS in parallel without requiring ping or administrator privileges.
+
+```powershell
+.\WinRM\Find-WinRM.ps1 -IpMask '192.168.1.*' | Format-Table -AutoSize
+.\WinRM\Find-WinRM.ps1 '10.0.0.0/24' -TimeoutMs 1500 -ThrottleLimit 32 |
+    Export-Csv .\winrm.csv -NoTypeInformation -Encoding UTF8
+```
+
+`WSManConfirmed` means the endpoint returned a WS-Management Identify response; it does not verify login permissions. `AuthenticationRequired` and `TcpOpenUnverified` indicate candidates, not confirmed WinRM services. HTTPS certificate errors appear in `Detail`. Default ports are 5985/5986; override with `-HttpPort` / `-HttpsPort`. Closed ports are omitted. CIDR excludes network/broadcast addresses except for /31 and /32; wildcards include all matching addresses. Ranges are limited to 65,536 addresses by default (`-MaxAddresses`).
+
+Use `-CheckConnection` to open a real PSSession and collect inventory. `ConnectAs` is the requested account (the current Windows account by default); `AuthenticatedAs` is the identity reported by the remote session. `LoggedOnUser` is the primary interactive user from `Win32_ComputerSystem`, not a list of all RDP sessions. DNS names are provisional; after login, `ComputerName` is read from the remote computer. `NameSource` identifies the source.
+
+```powershell
+$cred = Get-Credential 'OFFICE\admin'
+$pcs = .\WinRM\Find-WinRM.ps1 '192.168.1.*' -CheckConnection -Credential $cred -SavePath .\office.csv
+$pcs | Format-Table Address, ComputerName, ConnectAs, AuthenticatedAs, Status, UptimeDays, FreeSpaceGB -AutoSize
+```
+
+Inventory also includes `OS`, `OSVersion`, `LastBootTime` (UTC), and free space on C: in GiB (`FreeSpaceGB`). `ConnectionStatus` records login separately from `DiscoveryStatus`; `Status` reports the overall result. Login/inventory statuses include `Connected`, `AccessDenied`, `AuthenticationError`, `CertificateError`, `Timeout`, `ConnectionFailed`, and `InventoryFailed`. The last means login succeeded but inventory collection failed. `Detail` retains the underlying error. Unrecognized/localized connection errors fall back to `ConnectionFailed`.
+
+Keep `WinRM.Tools.psm1` beside both scripts. `-TimeoutMs` controls discovery I/O; `-OpenTimeoutMs` controls session opening; `-CommandTimeoutSec` limits each remote identity/inventory/command job. These are separate stages, not a total scan deadline. `-SkipDns` uses IP addresses directly. Otherwise a DNS name is used for authentication only if a forward lookup contains the scanned IP, and saved names are re-resolved before connection.
+
+No passwords are written to the CSV. Pass `-Credential` again when using saved inventory; a saved `ConnectAs` does not select credentials. The scripts preserve TLS validation and do not edit TrustedHosts. Windows imposes additional authentication requirements for [remoting by IP address or in a workgroup](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_remote_troubleshooting); failures are reported in the result.
+
+### Invoke-OfficeComputer.ps1
+Use saved inventory or pipeline objects to select computers and run inventory, a PowerShell command, a restart, or a shutdown. CSV input requires `-ComputerName` (exact name/IP), `-Select` (numbered console picker), or explicit `-All`. Pipeline input can be filtered with `Where-Object`. One endpoint per IP is selected: previously connected first, then confirmed WS-Management, then HTTPS. Commands are not retried on another endpoint.
+
+```powershell
+# Select computers interactively and collect fresh inventory, without scanning.
+.\Invoke-OfficeComputer.ps1 -InventoryPath .\office.csv -Select -Credential $cred `
+    -Action Inventory -SavePath .\office-updated.csv
+
+# Run a command on selected machines. Use arguments for local values.
+$results = .\Invoke-OfficeComputer.ps1 -InventoryPath .\office.csv `
+    -ComputerName PC01,PC02 -Credential $cred -Action Command `
+    -ScriptBlock { param($ServiceName) Get-Service -Name $ServiceName } -ArgumentList Spooler
+$results | Format-Table ComputerName, Status, Detail -AutoSize
+$results | ForEach-Object { $_.Output }
+
+# Preview the exact restart targets, then run with a separate confirmation.
+.\Invoke-OfficeComputer.ps1 -InventoryPath .\office.csv -ComputerName PC01,PC02 -Action Restart -WhatIf
+.\Invoke-OfficeComputer.ps1 -InventoryPath .\office.csv -ComputerName PC01,PC02 `
+    -Action Restart -Credential $cred -DelaySeconds 60
+
+# Shutdown uses the same selection and confirmation flow.
+.\Invoke-OfficeComputer.ps1 -InventoryPath .\office.csv -Select -Action Shutdown -Credential $cred
+
+# Refresh all saved computers explicitly, without repeating discovery.
+.\Invoke-OfficeComputer.ps1 -InventoryPath .\office.csv -All -Action Inventory `
+    -Credential $cred -ThrottleLimit 16 -SavePath .\office-updated.csv
+```
+
+`-WhatIf` opens no sessions and creates no log files. Built-in Restart/Shutdown always require interactive confirmation with the complete target list, even with `-Confirm:$false`. The default delay is 60 seconds (minimum 30). Windows [forces applications to close when a nonzero shutdown delay expires](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/shutdown); the confirmation explains this. `Scheduled` means Windows accepted the request, not that the restart/shutdown completed. Arbitrary `-ScriptBlock` commands execute as supplied and are not inspected for power actions. Local variables and `$using:` are not supported inside these script blocks; use `param(...)` with `-ArgumentList`.
+
+Every management run writes JSON Lines to `./winrm-logs/<timestamp>-<run-id>.jsonl`, or `-LogPath`. The log is opened before remote work and contains the selected targets, requested/actual identities, one result per computer, command output, errors, and run start/end events. Credentials and script text are not serialized; command output itself may contain sensitive data. Interrupted runs record unfinished targets with unknown outcomes. A command timeout stops the local job and closes the session, but cannot roll back effects already produced remotely. Native command exit codes must be checked explicitly inside your script block (as the built-in power actions do).
+
+`-SavePath` on the manager writes a new CSV containing only the selected, refreshed computers. It does not merge them into the original inventory. `Output` contains structured command results; the JSON log limits serialization depth to 12.
+
+Regression checks (loopback fixtures and mocked remote actions; no office computers are changed):
+
+```powershell
+.\tests\Test-OfficeWinRM.ps1
+```
+
 ### AddToStartup.ps1
 Add an application to Windows startup (HKCU registry).
 
