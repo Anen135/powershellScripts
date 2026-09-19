@@ -16,7 +16,9 @@
     Use -Remove to delete the firewall rule without resolving the domain.
 
 .PARAMETER Domain
-    The exact DNS name to block. Do not include a protocol, port, or path.
+    The exact DNS name to block. Do not include a protocol, port, or path. If
+    omitted, the script prompts for it. This supports execution through
+    Invoke-RestMethod and Invoke-Expression.
 
 .PARAMETER Remove
     Removes the firewall rule created for the domain.
@@ -42,15 +44,14 @@
     Shows the firewall rule change without applying it.
 
 .NOTES
-    Version: 1.1
+    Version: 1.2
     Author: Anen
     Requires Administrator privileges.
 #>
 
 [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
 param(
-    [Parameter(Mandatory, Position = 0)]
-    [ValidateNotNullOrEmpty()]
+    [Parameter(Position = 0)]
     [string]$Domain,
 
     [switch]$Remove
@@ -58,6 +59,34 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function Test-DomainFirewallShouldProcess {
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Target,
+
+        [Parameter(Mandatory)]
+        [string]$Action
+    )
+
+    return $PSCmdlet.ShouldProcess($Target, $Action)
+}
+
+$identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = [System.Security.Principal.WindowsPrincipal]::new($identity)
+if (-not $principal.IsInRole(
+        [System.Security.Principal.WindowsBuiltInRole]::Administrator
+    )) {
+    throw 'Run PowerShell as Administrator.'
+}
+
+if ([string]::IsNullOrWhiteSpace($Domain)) {
+    $Domain = Read-Host 'Domain'
+}
+if ([string]::IsNullOrWhiteSpace($Domain)) {
+    throw 'Domain cannot be empty.'
+}
 
 try {
     $domainValue = $Domain.Trim().TrimEnd('.')
@@ -100,10 +129,11 @@ try {
             return
         }
 
-        if ($PSCmdlet.ShouldProcess(
-                $normalizedDomain,
-                "Remove outbound firewall rule '$displayName'"
-            )) {
+        $shouldProcessParameters = @{
+            Target = $normalizedDomain
+            Action = "Remove outbound firewall rule '$displayName'"
+        }
+        if (Test-DomainFirewallShouldProcess @shouldProcessParameters) {
             Write-Verbose "Removing firewall rule '$ruleName'."
             Remove-NetFirewallRule -Name $ruleName -ErrorAction Stop
 
@@ -117,15 +147,16 @@ try {
     }
 
     Write-Verbose "Resolving '$normalizedDomain'..."
-    $addresses = @(
-        [System.Net.Dns]::GetHostAddresses($normalizedDomain) |
-            Where-Object {
-                $_.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetwork -or
-                $_.AddressFamily -eq [System.Net.Sockets.AddressFamily]::InterNetworkV6
-            } |
-            ForEach-Object IPAddressToString |
-            Sort-Object -Unique
-    )
+    $addressList = [System.Collections.Generic.List[string]]::new()
+    foreach ($address in [System.Net.Dns]::GetHostAddresses($normalizedDomain)) {
+        if ($address.AddressFamily -eq
+                [System.Net.Sockets.AddressFamily]::InterNetwork -or
+            $address.AddressFamily -eq
+                [System.Net.Sockets.AddressFamily]::InterNetworkV6) {
+            $addressList.Add($address.IPAddressToString)
+        }
+    }
+    $addresses = @($addressList | Sort-Object -Unique)
 
     if ($addresses.Count -eq 0) {
         throw "DNS did not return an IPv4 or IPv6 address for '$normalizedDomain'."
@@ -135,10 +166,11 @@ try {
 
     $operation = if ($null -eq $existingRule) { 'Create' } else { 'Update' }
 
-    if ($PSCmdlet.ShouldProcess(
-            "$normalizedDomain ($($addresses -join ', '))",
-            "$operation outbound firewall rule '$displayName'"
-        )) {
+    $shouldProcessParameters = @{
+        Target = "$normalizedDomain ($($addresses -join ', '))"
+        Action = "$operation outbound firewall rule '$displayName'"
+    }
+    if (Test-DomainFirewallShouldProcess @shouldProcessParameters) {
         if ($null -eq $existingRule) {
             Write-Verbose "Creating firewall rule '$ruleName'."
             $newRuleParameters = @{

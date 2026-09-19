@@ -216,6 +216,30 @@ privileges.
 ./Block-DomainHosts.ps1 -Domain "www.example.com"
 ```
 
+### Cloudflare Pages
+The domain-blocking scripts are published at
+[anen-powershell-scripts.pages.dev](https://anen-powershell-scripts.pages.dev/).
+Run PowerShell as Administrator. These short commands download the current
+script and then prompt for the domain:
+
+~~~powershell
+irm https://anen-powershell-scripts.pages.dev/firewall.ps1 | iex
+irm https://anen-powershell-scripts.pages.dev/hosts.ps1 | iex
+~~~
+
+To pass parameters directly, create and invoke a script block:
+
+~~~powershell
+& ([scriptblock]::Create((irm https://anen-powershell-scripts.pages.dev/firewall.ps1))) -Domain "example.com"
+& ([scriptblock]::Create((irm https://anen-powershell-scripts.pages.dev/hosts.ps1))) -Domain "example.com" -Remove
+~~~
+
+Publish the current local versions again with:
+
+~~~powershell
+./Publish-DomainBlockPages.ps1
+~~~
+
 ### Get-CurrentWifiPassword.ps1
 Displays the SSID and password of the currently connected Wi-Fi network using `netsh` without admin rights.
 

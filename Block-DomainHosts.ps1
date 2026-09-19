@@ -18,7 +18,9 @@
     0.0.0.0 or :: entries.
 
 .PARAMETER Domain
-    The exact DNS name to block. Do not include a protocol, port, or path.
+    The exact DNS name to block. Do not include a protocol, port, or path. If
+    omitted, the script prompts for it. This supports execution through
+    Invoke-RestMethod and Invoke-Expression.
 
 .PARAMETER Remove
     Removes the hosts-file block for the domain.
@@ -44,15 +46,14 @@
     Shows the hosts-file change without applying it.
 
 .NOTES
-    Version: 1.1
+    Version: 1.2
     Author: Anen
     Requires Administrator privileges.
 #>
 
 [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
 param(
-    [Parameter(Mandatory, Position = 0)]
-    [ValidateNotNullOrEmpty()]
+    [Parameter(Position = 0)]
     [string]$Domain,
 
     [switch]$Remove
@@ -60,6 +61,34 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+function Test-DomainHostsShouldProcess {
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Target,
+
+        [Parameter(Mandatory)]
+        [string]$Action
+    )
+
+    return $PSCmdlet.ShouldProcess($Target, $Action)
+}
+
+$identity = [System.Security.Principal.WindowsIdentity]::GetCurrent()
+$principal = [System.Security.Principal.WindowsPrincipal]::new($identity)
+if (-not $principal.IsInRole(
+        [System.Security.Principal.WindowsBuiltInRole]::Administrator
+    )) {
+    throw 'Run PowerShell as Administrator.'
+}
+
+if ([string]::IsNullOrWhiteSpace($Domain)) {
+    $Domain = Read-Host 'Domain'
+}
+if ([string]::IsNullOrWhiteSpace($Domain)) {
+    throw 'Domain cannot be empty.'
+}
 
 try {
     $domainValue = $Domain.Trim().TrimEnd('.')
@@ -174,10 +203,11 @@ try {
     $action = if ($Remove) { 'Remove block for' } else { 'Block' }
     $status = if ($Remove) { 'Removed' } else { 'Blocked' }
 
-    if ($PSCmdlet.ShouldProcess(
-            $hostsPath,
-            "$action '$normalizedDomain' and clear the DNS client cache"
-        )) {
+    $shouldProcessParameters = @{
+        Target = $hostsPath
+        Action = "$action '$normalizedDomain' and clear the DNS client cache"
+    }
+    if (Test-DomainHostsShouldProcess @shouldProcessParameters) {
         $timestamp = Get-Date -Format 'yyyyMMdd-HHmmssfff'
         $backupPath = "$hostsPath.block-domain-backup-$timestamp"
 

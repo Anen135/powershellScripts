@@ -11,6 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Block-DomainFirewall.ps1` and `Block-DomainHosts.ps1` now support the `-Remove`
   switch for removing the domain block. The hosts-file script preserves
   unrelated mappings and still creates a backup before changing the file.
+- Both domain-blocking scripts now perform an explicit Administrator check so
+  elevation is still enforced when their source is executed through
+  `Invoke-Expression`.
+
+### Added
+- `Publish-DomainBlockPages.ps1` builds and deploys a minimal Cloudflare
+  Pages site containing the two domain-blocking scripts under full and short
+  names.
 
 ## [1.6.0] - 2026-09-19
 
