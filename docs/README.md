@@ -192,6 +192,26 @@ Interactive console-based directory navigator with keyboard controls.
 
 ## Network
 
+### Block-DomainFirewall.ps1
+Resolves a domain to its current IPv4/IPv6 addresses and creates or updates an
+outbound Windows Defender Firewall rule. Because DNS addresses can change, run
+the script again to refresh the rule. Requires Administrator privileges.
+
+```powershell
+./Block-DomainFirewall.ps1 -Domain "example.com"
+./Block-DomainFirewall.ps1 -Domain "example.com" -WhatIf
+```
+
+### Block-DomainHosts.ps1
+Blocks an exact domain through IPv4 and IPv6 entries in the Windows hosts file,
+backs up the original file, and clears the DNS cache. Subdomains must be added
+separately. Requires Administrator privileges.
+
+```powershell
+./Block-DomainHosts.ps1 -Domain "example.com"
+./Block-DomainHosts.ps1 -Domain "www.example.com"
+```
+
 ### Get-CurrentWifiPassword.ps1
 Displays the SSID and password of the currently connected Wi-Fi network using `netsh` without admin rights.
 
