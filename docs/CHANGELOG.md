@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2026-09-19
+
+### Fixed
+- `Set-KeyboardState.ps1`: device disabled-state detection no longer relies on the
+  `Status` string `Disabled`. Since `Disable-PnpDevice` actually reports `Status` =
+  `Error` with problem code 22 (`CM_PROB_DISABLED`), `-Enable` and the skip logic
+  missed such devices. Detection now checks `DEVPKEY_Device_ProblemCode` == 22.
+- `VPN-Bypass-Manager.ps1`: `Add-Bypass` now prints the DNS resolution failure
+  reason (`$_.Exception.Message`) in red instead of a plain message.
+
+### Changed
+- `Init-WinRM.ps1`, `RemoveWinRmLimit.ps1`: script structure simplified - removed
+  the `begin`/`process`/`end` scaffolding so initialization, processing and error
+  handling live at the top level (project error-handling standard). Internal
+  version bumped to 1.1 in both scripts.
+
 ## [1.4.0] - 2026-09-09
 
 ### Fixed

@@ -24,7 +24,7 @@
     information.
 
 .NOTES
-    Version: 1.0
+    Version: 1.1
     Author: Anen
 #>
 
@@ -34,31 +34,25 @@ param()
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-begin {
-    Write-Verbose "Initializing parameters..."
+Write-Verbose "Initializing parameters..."
+
+try {
+    $RegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
+
+    Write-Verbose "Setting '$RegPath\LimitBlankPasswordUse' to 0"
+
+    Set-ItemProperty `
+        -Path $RegPath `
+        -Name 'LimitBlankPasswordUse' `
+        -Value 0 `
+        -Type DWord `
+        -ErrorAction Stop
+
+    Write-Output "Blank-password restriction for local accounts disabled."
+}
+catch {
+    Write-Error "Error disabling blank-password restriction: $($_.Exception.Message)"
+    throw
 }
 
-process {
-    try {
-        $RegPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa"
-
-        Write-Verbose "Setting '$RegPath\LimitBlankPasswordUse' to 0"
-
-        Set-ItemProperty `
-            -Path $RegPath `
-            -Name 'LimitBlankPasswordUse' `
-            -Value 0 `
-            -Type DWord `
-            -ErrorAction Stop
-
-        Write-Output "Blank-password restriction for local accounts disabled."
-    }
-    catch {
-        Write-Error "Error disabling blank-password restriction: $($_.Exception.Message)"
-        throw
-    }
-}
-
-end {
-    Write-Verbose "Script execution completed."
-}
+Write-Verbose "Script execution completed."

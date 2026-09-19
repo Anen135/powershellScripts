@@ -199,6 +199,16 @@ function Get-KeyboardDevices {
     return @(Get-PnpDevice -Class Keyboard -PresentOnly -ErrorAction SilentlyContinue)
 }
 
+function Test-KeyboardDeviceDisabled {
+    param([string]$InstanceId)
+
+    # Disable-PnpDevice ставит устройству ProblemCode = 22 (CM_PROB_DISABLED),
+    # при котором Status устройства = 'Error', а не 'Disabled'. Из-за проверки
+    # по строке 'Disabled' -Enable пропускал такие устройства. Проверяем именно код 22.
+    $prob = Get-PnpDeviceProperty -InstanceId $InstanceId -KeyName 'DEVPKEY_Device_ProblemCode' -ErrorAction SilentlyContinue
+    if ($null -eq $prob -or $null -eq $prob.Data) { return $false }
+    return ([int]$prob.Data -eq 22)
+}
 function Disable-KeyboardDevices {
     $devices = @()
     $devices += Get-KeyboardDevices
@@ -209,7 +219,7 @@ function Disable-KeyboardDevices {
     }
 
     foreach ($device in $devices) {
-        if ($device.Status -eq 'Disabled') {
+        if (Test-KeyboardDeviceDisabled -InstanceId $device.InstanceId) {
             Write-Verbose "Device '$($device.FriendlyName)' is already disabled. Skipped."
             continue
         }
@@ -230,7 +240,7 @@ function Enable-KeyboardDevices {
     }
 
     foreach ($device in $devices) {
-        if ($device.Status -ne 'Disabled') {
+        if (-not (Test-KeyboardDeviceDisabled -InstanceId $device.InstanceId)) {
             Write-Verbose "Device '$($device.FriendlyName)' is already enabled ($($device.Status)). Skipped."
             continue
         }

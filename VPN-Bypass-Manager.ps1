@@ -125,7 +125,7 @@ function Add-Bypass {
                 Write-Warning "Domain resolved, but no IPv4 addresses found for: $Target"
             }
         } catch {
-            Write-Host "Could not resolve domain: $Target" 
+            Write-Host "Could not resolve domain: $Target.  $($_.Exception.Message)" -ForegroundColor Red
         }
     }
 }
