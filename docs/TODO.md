@@ -1,4 +1,4 @@
 ## Completed
 
-- [x] Add standalone domain-blocking scripts for Windows Defender Firewall and
-  the Windows hosts file.
+- [x] Add standalone scripts to add or remove domain blocks through Windows
+  Defender Firewall and the Windows hosts file.

@@ -3,7 +3,7 @@
 
 <#
 .SYNOPSIS
-    Blocks a domain through the Windows hosts file.
+    Adds or removes a domain block in the Windows hosts file.
 
 .DESCRIPTION
     Removes existing mappings for the exact DNS name, adds IPv4 and IPv6 block
@@ -14,8 +14,14 @@
     Only the exact name is blocked. Run the script separately for subdomains
     such as www.example.com.
 
+    Use -Remove to delete the managed block and any matching orphaned
+    0.0.0.0 or :: entries.
+
 .PARAMETER Domain
     The exact DNS name to block. Do not include a protocol, port, or path.
+
+.PARAMETER Remove
+    Removes the hosts-file block for the domain.
 
 .EXAMPLE
     .\Block-DomainHosts.ps1 -Domain "example.com"
@@ -28,12 +34,17 @@
     Blocks the domain and displays detailed progress information.
 
 .EXAMPLE
+    .\Block-DomainHosts.ps1 -Domain "example.com" -Remove
+
+    Removes the hosts-file block for example.com.
+
+.EXAMPLE
     .\Block-DomainHosts.ps1 -Domain "example.com" -WhatIf
 
     Shows the hosts-file change without applying it.
 
 .NOTES
-    Version: 1.0
+    Version: 1.1
     Author: Anen
     Requires Administrator privileges.
 #>
@@ -42,7 +53,9 @@
 param(
     [Parameter(Mandatory, Position = 0)]
     [ValidateNotNullOrEmpty()]
-    [string]$Domain
+    [string]$Domain,
+
+    [switch]$Remove
 )
 
 Set-StrictMode -Version Latest
@@ -70,16 +83,19 @@ try {
     }
 
     Write-Verbose "Reading '$hostsPath'."
-    $hostsContents = [System.IO.File]::ReadAllText($hostsPath)
+    $originalHostsContents = [System.IO.File]::ReadAllText($hostsPath)
+    $hostsContents = $originalHostsContents
     $beginMarker = "# BEGIN Block-DomainHosts: $normalizedDomain"
     $endMarker = "# END Block-DomainHosts: $normalizedDomain"
 
-    # Remove a block created by an earlier run before rebuilding it.
+    # Remove a managed block created by an earlier run.
     $blockPattern = '(?ms)^' + [regex]::Escape($beginMarker) +
         '\r?$\n.*?^' + [regex]::Escape($endMarker) + '\r?$(?:\n)?'
     $hostsContents = [regex]::Replace($hostsContents, $blockPattern, '')
+    $managedBlockRemoved = $hostsContents -cne $originalHostsContents
 
     $updatedLines = [System.Collections.Generic.List[string]]::new()
+    $mappingRemoved = $false
     foreach ($line in ($hostsContents -split '\r?\n')) {
         $commentIndex = $line.IndexOf('#')
         if ($commentIndex -ge 0) {
@@ -97,30 +113,47 @@ try {
         )
 
         if ($tokens.Count -ge 2) {
-            $remainingNames = @(
-                $tokens[1..($tokens.Count - 1)] |
-                    Where-Object { $_ -ine $normalizedDomain }
-            )
+            $removeMapping = -not $Remove -or
+                $tokens[0] -eq '0.0.0.0' -or
+                $tokens[0] -eq '::'
 
-            if ($remainingNames.Count -ne ($tokens.Count - 1)) {
-                Write-Verbose "Removing an existing mapping for '$normalizedDomain'."
+            if ($removeMapping) {
+                $remainingNames = @(
+                    $tokens[1..($tokens.Count - 1)] |
+                        Where-Object { $_ -ine $normalizedDomain }
+                )
 
-                if ($remainingNames.Count -gt 0) {
-                    $rebuiltLine = "$($tokens[0])$([char]9)$($remainingNames -join ' ')"
-                    if ($commentPart.Length -gt 0) {
-                        $rebuiltLine += " $commentPart"
+                if ($remainingNames.Count -ne ($tokens.Count - 1)) {
+                    Write-Verbose "Removing an existing mapping for '$normalizedDomain'."
+                    $mappingRemoved = $true
+
+                    if ($remainingNames.Count -gt 0) {
+                        $rebuiltLine = "$($tokens[0])$([char]9)$($remainingNames -join ' ')"
+                        if ($commentPart.Length -gt 0) {
+                            $rebuiltLine += " $commentPart"
+                        }
+                        $updatedLines.Add($rebuiltLine)
                     }
-                    $updatedLines.Add($rebuiltLine)
-                }
-                elseif ($commentPart.Length -gt 0) {
-                    $updatedLines.Add($commentPart)
-                }
+                    elseif ($commentPart.Length -gt 0) {
+                        $updatedLines.Add($commentPart)
+                    }
 
-                continue
+                    continue
+                }
             }
         }
 
         $updatedLines.Add($line)
+    }
+
+    if ($Remove -and -not $managedBlockRemoved -and -not $mappingRemoved) {
+        Write-Output ([PSCustomObject]@{
+            Domain     = $normalizedDomain
+            HostsPath  = $hostsPath
+            BackupPath = $null
+            Status     = 'NotFound'
+        })
+        return
     }
 
     while ($updatedLines.Count -gt 0 -and
@@ -128,17 +161,22 @@ try {
         $updatedLines.RemoveAt($updatedLines.Count - 1)
     }
 
-    $updatedLines.Add('')
-    $updatedLines.Add($beginMarker)
-    $updatedLines.Add("0.0.0.0$([char]9)$normalizedDomain")
-    $updatedLines.Add("::$([char]9)$normalizedDomain")
-    $updatedLines.Add($endMarker)
+    if (-not $Remove) {
+        $updatedLines.Add('')
+        $updatedLines.Add($beginMarker)
+        $updatedLines.Add("0.0.0.0$([char]9)$normalizedDomain")
+        $updatedLines.Add("::$([char]9)$normalizedDomain")
+        $updatedLines.Add($endMarker)
+    }
+
     $newContents = ($updatedLines -join [Environment]::NewLine) +
         [Environment]::NewLine
+    $action = if ($Remove) { 'Remove block for' } else { 'Block' }
+    $status = if ($Remove) { 'Removed' } else { 'Blocked' }
 
     if ($PSCmdlet.ShouldProcess(
             $hostsPath,
-            "Block '$normalizedDomain' and clear the DNS client cache"
+            "$action '$normalizedDomain' and clear the DNS client cache"
         )) {
         $timestamp = Get-Date -Format 'yyyyMMdd-HHmmssfff'
         $backupPath = "$hostsPath.block-domain-backup-$timestamp"
@@ -146,7 +184,7 @@ try {
         Write-Verbose "Creating backup '$backupPath'."
         Copy-Item -LiteralPath $hostsPath -Destination $backupPath -ErrorAction Stop
 
-        Write-Verbose "Writing block entries for '$normalizedDomain'."
+        Write-Verbose "Writing updated hosts file for '$normalizedDomain'."
         $utf8WithoutBom = [System.Text.UTF8Encoding]::new($false)
         [System.IO.File]::WriteAllText($hostsPath, $newContents, $utf8WithoutBom)
 
@@ -157,11 +195,11 @@ try {
             Domain     = $normalizedDomain
             HostsPath  = $hostsPath
             BackupPath = $backupPath
-            Status     = 'Blocked'
+            Status     = $status
         })
     }
 }
 catch {
-    Write-Error "Failed to block domain through the hosts file: $($_.Exception.Message)"
+    Write-Error "Failed to manage the hosts-file domain block: $($_.Exception.Message)"
     throw
 }
